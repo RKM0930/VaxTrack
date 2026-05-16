@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VaxTrack | Portal Access</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/user.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="auth-body">
+  <button class="lang-toggle-btn floating-lang-toggle">EN / TL</button>
+  
+  <div id="loading-overlay" class="loading-overlay hidden"><div class="loader-box"><div class="spinner"></div><p id="loaderText">Authenticating...</p></div></div>
+  <div id="toast-container" class="toast-container"></div>
+
+  <div class="auth-wrapper">
+    <div class="auth-left">
+      <h1>VaxTrack</h1>
+      <div class="auth-divider"></div>
+      <p>Barangay San Antonio de Padua I<br>Health Records System</p>
+    </div>
+
+    <div class="auth-right">
+      <div id="parentLoginView">
+        <div class="form-header">
+          <h2 class="form-title" data-i18n="auth.parent_title">Parent Portal</h2>
+          <p class="form-sub" data-i18n="auth.parent_sub">Access your baby's vaccination records</p>
+        </div>
+        <form id="parentLoginForm">
+          <div class="form-group"><div class="input-group"><i class="fas fa-envelope"></i><input type="email" name="email" data-i18n="auth.email" placeholder="Email Address" required></div></div>
+          <div class="form-group"><div class="input-group"><i class="fas fa-lock"></i><input type="password" name="password" data-i18n="auth.pass" placeholder="Password" required></div></div>
+          <button type="submit" class="btn btn-primary" style="width:100%" data-i18n="auth.signin">Sign In</button>
+        </form>
+        
+        <div class="auth-footer mt-2">
+          <p class="divider-text"><span data-i18n="auth.no_account">Don't have an account?</span> <button type="button" class="text-link" onclick="toggleView('registerView')" data-i18n="auth.register">Register</button></p>
+          <div class="auth-separator"></div>
+          <div class="links"><button type="button" class="secondary-link" onclick="toggleView('adminLoginView')" data-i18n="auth.bhw_login">Healthcare Worker Login</button></div>
+        </div>
+      </div>
+
+      <div id="registerView" class="hidden">
+        <div class="form-header">
+          <h2 class="form-title" data-i18n="auth.reg_title">Create Account</h2>
+          <p class="form-sub" data-i18n="auth.reg_sub">Register to track your baby's health</p>
+        </div>
+        <form id="registerForm">
+          <div class="form-group"><input type="text" name="name" class="form-control" data-i18n="auth.name" placeholder="Full Name" required></div>
+          <div class="form-group"><input type="email" name="email" class="form-control" data-i18n="auth.email" placeholder="Email Address" required></div>
+          <div class="form-group"><input type="password" name="password" id="regPass" class="form-control" data-i18n="auth.pass" placeholder="Password" required></div>
+          <div class="form-group"><input type="password" name="confirmPassword" id="regConfirm" class="form-control" data-i18n="auth.confirm" placeholder="Confirm Password" required></div>
+          <button type="submit" class="btn btn-primary" style="width:100%" data-i18n="auth.complete_reg">Complete Registration</button>
+        </form>
+        
+        <div class="auth-footer mt-2">
+          <p class="divider-text"><span data-i18n="auth.has_account">Already have an account?</span> <button type="button" class="text-link" onclick="toggleView('parentLoginView')" data-i18n="auth.signin">Sign In</button></p>
+        </div>
+      </div>
+
+      <div id="adminLoginView" class="hidden">
+        <div class="form-header">
+          <h2 class="form-title" style="color: var(--color-dark)">Admin Access</h2>
+          <p class="form-sub">Secure BHW authentication</p>
+        </div>
+        <form id="adminLoginForm">
+          <div class="form-group"><div class="input-group"><i class="fas fa-id-badge"></i><input type="email" name="email" placeholder="BHW Email" required></div></div>
+          <div class="form-group"><div class="input-group"><i class="fas fa-key"></i><input type="password" name="password" placeholder="Secure Password" required></div></div>
+          <button type="submit" class="btn btn-primary" style="width:100%; background: var(--color-dark);">Authenticate</button>
+        </form>
+        
+        <div class="auth-footer mt-2">
+          <div class="auth-separator"></div>
+          <div class="links"><button type="button" class="secondary-link" onclick="toggleView('parentLoginView')">Return to Parent Portal</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/index.js"></script>
+</body>
+</html>

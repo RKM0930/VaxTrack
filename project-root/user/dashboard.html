@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard | VaxTrack</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/user.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <div id="loading-overlay" class="loading-overlay hidden"><div class="loader-box"><div class="spinner"></div><p id="loaderText">Loading...</p></div></div>
+  <div id="toast-container" class="toast-container"></div>
+  
+  <nav class="top-nav">
+    <div class="nav-container">
+      <div class="logo">VaxTrack <span>Parent</span></div>
+      <div class="nav-right">
+        <a href="search.html" style="color:white; margin-right:15px;"><i class="fas fa-search"></i> Search</a>
+        <div class="user-pill">
+          <div class="avatar-circle" id="userInitial">U</div>
+          <div class="user-details"><span id="userName">User</span><span class="role-text">Parent</span></div>
+        </div>
+        <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <div class="dashboard-actions">
+      <h2>My Registered Babies</h2>
+      <a href="baby-register.html" class="btn btn-primary"><i class="fas fa-plus"></i> Register New Baby</a>
+    </div>
+    <div class="baby-grid" id="babyGrid"></div>
+  </main>
+
+  <script type="module" src="../js/user/dashboard.js"></script>
+</body>
+</html>

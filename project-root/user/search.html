@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Directory | VaxTrack</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/user.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <div id="loading-overlay" class="loading-overlay hidden">
+    <div class="loader-box">
+      <div class="spinner"></div>
+      <p id="loaderText">Searching...</p>
+    </div>
+  </div>
+  
+  <nav class="top-nav">
+    <div class="nav-container">
+      <div class="logo">VaxTrack <span>Parent</span></div>
+      <div class="nav-right">
+        <a href="dashboard.html" style="color:white; margin-right:15px;">
+          <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <div class="user-pill">
+          <div class="avatar-circle" id="userInitial">U</div>
+          <div class="user-details">
+            <span id="userName">User</span>
+            <span class="role-text">Parent</span>
+          </div>
+        </div>
+        <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-content" style="max-width: 600px;">
+    <div class="card">
+      <h2 class="card-title">Search Directory</h2>
+      <div class="input-group">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" class="form-control" placeholder="Type baby name..." autocomplete="off">
+      </div>
+    </div>
+    
+    <div id="searchResults" style="display: flex; flex-direction: column; gap: 15px;">
+      </div>
+  </main>
+
+  <script type="module" src="../js/user/search.js"></script>
+</body>
+</html>
