@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en-PH">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Record | VaxTrack</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/user.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <div id="loading-overlay" class="loading-overlay hidden">
+    <div class="loader-box"><div class="spinner"></div><p id="loaderText">Naghahanap...</p></div>
+  </div>
+  <nav class="top-nav">
+    <div class="nav-container nav-actions-only dashboard-nav">
+      <div class="nav-right">
+        <a href="dashboard.html" class="profile-back-link" aria-label="Bumalik sa dashboard" title="Bumalik"><i class="fas fa-arrow-left"></i></a>
+        <div class="user-pill">
+          <div class="avatar-circle" id="userInitial">U</div>
+          <div class="user-details"><span id="userName">User</span><span class="role-text" data-i18n="role.parent">Parent</span></div>
+        </div>
+        <button id="logoutBtn" class="logout-btn" aria-label="Mag-logout"><i class="fas fa-sign-out-alt"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-content search-shell">
+    <section class="page-hero compact">
+      <div>
+        <p class="page-kicker">Search</p>
+        <h1 data-i18n="search.title">Search Baby Record</h1>
+        <p data-i18n="search.subtitle">Hanapin ang baby record gamit ang pangalan o registration number.</p>
+      </div>
+    </section>
+
+    <div class="card">
+      <div class="input-group">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" class="form-control" data-i18n="search.placeholder" placeholder="Type baby name or Reg No..." autocomplete="off">
+      </div>
+    </div>
+    <div id="searchResults" class="search-results-grid"></div>
+  </main>
+
+  <script type="module" src="../js/user/search.js"></script>
+</body>
+</html>

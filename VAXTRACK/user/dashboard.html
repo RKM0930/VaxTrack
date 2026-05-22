@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en-PH">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | VaxTrack</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/user.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <div id="loading-overlay" class="loading-overlay hidden"><div class="loader-box"><div class="spinner"></div><p id="loaderText">Naglo-load...</p></div></div>
+  <div id="toast-container" class="toast-container"></div>
+  <nav class="top-nav">
+    <div class="nav-container dashboard-nav parent-dashboard-nav">
+      <div class="nav-right parent-nav-controls">
+        <div class="notification-menu" id="notificationMenu">
+          <button type="button" id="notificationBell" class="notification-bell-btn" aria-expanded="false" aria-controls="notificationDropdown" aria-label="Open notifications">
+            <i class="fas fa-bell" aria-hidden="true"></i>
+            <span id="notificationCount" class="notification-count hidden" aria-label="0 notifications">0</span>
+          </button>
+          <div id="notificationDropdown" class="notification-dropdown hidden" role="dialog" aria-modal="false" aria-label="Notifications">
+            <div class="notification-dropdown-header">
+              <div class="notification-dropdown-title">
+                <strong data-i18n="dashboard.notifications">Notifications</strong>
+                <span id="notificationSummary">0</span>
+              </div>
+              <button type="button" id="markAllNotificationsRead" class="notification-mark-all-btn" data-i18n="dashboard.mark_all_read">Mark all as read</button>
+            </div>
+            <div id="notificationList" class="notification-list"></div>
+            <div id="notificationDropdownFooter" class="notification-dropdown-footer">
+              <button type="button" id="viewAllNotifications" class="notification-view-all-btn" data-i18n="dashboard.view_all_notifications">View All</button>
+            </div>
+          </div>
+        </div>
+        <div class="user-pill parent-profile-pill">
+          <div class="user-details"><span id="userName">User</span><span class="role-text" data-i18n="role.parent">Parent</span></div>
+        </div>
+        <button id="logoutBtn" class="logout-btn" aria-label="Mag-logout"><i class="fas fa-sign-out-alt"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <div id="notificationsFullOverlay" class="notification-full-overlay hidden" role="dialog" aria-modal="true" aria-label="All notifications">
+    <div class="notification-full-panel" role="document">
+      <div class="notification-full-header">
+        <div class="notification-full-title">
+          <strong data-i18n="dashboard.notifications">Notifications</strong>
+          <span id="notificationFullSummary">0</span>
+        </div>
+        <div class="notification-full-actions">
+          <button type="button" id="markAllNotificationsReadFull" class="notification-mark-all-btn" data-i18n="dashboard.mark_all_read">Mark all as read</button>
+          <button type="button" id="closeNotificationsFull" class="notification-full-close" aria-label="Close notifications"><i class="fas fa-times" aria-hidden="true"></i></button>
+        </div>
+      </div>
+      <div id="notificationFullList" class="notification-full-list"></div>
+    </div>
+  </div>
+
+  <main class="main-content parent-dashboard-shell">
+    <div class="dashboard-records-layout baby-records-overlay-layout">
+      <div class="baby-records-side-tabs" aria-label="Dashboard quick actions">
+        <button type="button" id="babyRecordsTrigger" class="baby-records-bookmark-trigger baby-records-side-tab" aria-expanded="false" aria-controls="babyRecordsPanel" aria-label="Open Baby Records">
+          <i class="fas fa-baby" aria-hidden="true"></i>
+        </button>
+        <a href="baby-register.html" class="baby-records-add-trigger baby-records-side-tab" aria-label="Register New Baby" title="Register New Baby">
+          <i class="fas fa-plus" aria-hidden="true"></i>
+        </a>
+        <button type="button" id="documentsTrigger" class="baby-records-documents-trigger baby-records-side-tab" aria-expanded="false" aria-controls="documentsPanel" aria-label="Open Documents" title="Documents">
+          <i class="fas fa-file-lines" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div id="babyRecordsOverlayBackdrop" class="baby-records-overlay-backdrop hidden" aria-hidden="true"></div>
+
+      <aside class="baby-selector-panel baby-records-overlay-panel card hidden" id="babyRecordsPanel" aria-label="Baby records list" role="dialog" aria-modal="false">
+        <div class="baby-selector-header">
+          <h2 data-i18n="dashboard.my_babies">Baby Records</h2>
+          <button type="button" id="babyRecordsClose" class="baby-records-close-btn" aria-label="Close Baby Records"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="baby-selector-list" id="babyGrid"></div>
+      </aside>
+
+      <section class="baby-record-panel" id="babyRecordPanel" aria-live="polite">
+        <div class="empty-state" data-i18n="dashboard.select_baby_prompt">Pumili ng baby record para makita ang vaccination details.</div>
+      </section>
+    </div>
+  </main>
+
+  <script type="module" src="../js/user/dashboard.js"></script>
+</body>
+</html>

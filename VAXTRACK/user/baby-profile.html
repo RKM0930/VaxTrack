@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en-PH">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Baby Profile | VaxTrack</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/user.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <div id="loading-overlay" class="loading-overlay hidden"><div class="loader-box"><div class="spinner"></div><p id="loaderText">Naglo-load...</p></div></div>
+  <div id="toast-container" class="toast-container"></div>
+  <nav class="top-nav">
+    <div class="nav-container nav-actions-only dashboard-nav">
+      <div class="nav-right">
+        <a href="dashboard.html" class="profile-back-link" aria-label="Bumalik sa dashboard" title="Bumalik sa dashboard"><i class="fas fa-arrow-left"></i></a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-content" id="profileContent" style="max-width: 980px;">
+    <section class="page-hero compact">
+      <div>
+        <p class="page-kicker">Baby Profile</p>
+        <h1 id="babyName" style="margin-bottom: 6px;"></h1>
+        <p id="babyProfileSummary">Vaccination record, medical tests, and upcoming schedules.</p>
+      </div>
+    </section>
+
+    <div class="card" id="babyDetails"></div>
+
+    <div class="card mt-2">
+      <h3 class="card-title" data-i18n="dashboard.documents"><i class="fas fa-file-contract"></i> Documents</h3>
+      <div id="profileDocuments"></div>
+    </div>
+
+    <div class="card mt-2">
+      <h3 class="card-title" data-i18n="profile.test_history"><i class="fas fa-vial"></i> Medical Test History</h3>
+      <div class="table-responsive">
+        <table>
+          <thead><tr><th data-i18n="table.test">Test</th><th data-i18n="table.date">Date</th><th data-i18n="table.result">Result</th></tr></thead>
+          <tbody id="testHistoryTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card mt-2">
+      <h3 class="card-title" data-i18n="profile.history">Vaccination History</h3>
+      <div class="table-responsive">
+        <table>
+          <thead><tr><th data-i18n="table.vaccine">Vaccine</th><th data-i18n="table.date">Date</th><th data-i18n="table.dose">Dose</th><th data-i18n="table.batch">Batch</th><th data-i18n="table.worker">Worker</th><th data-i18n="table.status">Status</th></tr></thead>
+          <tbody id="historyTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card mt-2">
+      <h3 class="card-title" data-i18n="profile.upcoming">Upcoming Vaccinations</h3>
+      <div class="table-responsive">
+        <table>
+          <thead><tr><th data-i18n="table.vaccine">Vaccine</th><th data-i18n="table.target">Target Date</th><th data-i18n="table.status">Status</th></tr></thead>
+          <tbody id="upcomingTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+  <script type="module" src="../js/user/baby-profile.js"></script>
+</body>
+</html>

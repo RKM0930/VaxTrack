@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en-PH">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register Baby | VaxTrack</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/user.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <div id="loading-overlay" class="loading-overlay hidden"><div class="loader-box"><div class="spinner"></div><p id="loaderText">Sine-save...</p></div></div>
+  <div id="toast-container" class="toast-container"></div>
+  <nav class="top-nav registration-top-nav">
+    <div class="nav-container registration-nav-container">
+      <a href="dashboard.html" class="profile-back-link" aria-label="Bumalik sa dashboard" title="Bumalik"><i class="fas fa-arrow-left"></i></a>
+    </div>
+  </nav>
+  <main class="main-content registration-page-shell">
+    <section class="page-hero compact registration-card">
+      <div>
+        <p class="page-kicker">Baby Registration</p>
+        <h1 data-i18n="baby_register.title">Register New Baby</h1>
+        <p data-i18n="baby_register.subtitle">Ilagay ang impormasyon ni baby at i-upload ang birth certificate para ma-review ng BHW.</p>
+      </div>
+    </section>
+
+    <div class="card registration-card">
+      <form id="babyForm">
+        <section class="form-section">
+          <div class="form-section-title"><i class="fas fa-baby"></i><span data-i18n="baby_register.basic_info">Baby Information</span></div>
+          <div class="form-grid name-grid">
+            <div class="field-group"><label data-i18n="baby_register.first_name">First Name</label><input type="text" name="firstName" required autocomplete="given-name"></div>
+            <div class="field-group"><label data-i18n="baby_register.middle_name">Middle Name</label><input type="text" name="middleName" autocomplete="additional-name"></div>
+            <div class="field-group"><label data-i18n="baby_register.last_name">Last Name</label><input type="text" name="lastName" required autocomplete="family-name"></div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="form-section-title"><i class="fas fa-cake-candles"></i><span data-i18n="baby_register.birth_details">Birth Details</span></div>
+          <div class="form-grid">
+            <div class="field-group"><label data-i18n="baby_register.dob">Date of Birth</label><input type="date" name="dob" required></div>
+            <div class="field-group"><label data-i18n="baby_register.sex">Sex</label><select name="sex" required><option>Male</option><option>Female</option></select></div>
+          </div>
+          <div class="field-group"><label data-i18n="baby_register.place_of_birth">Place of Birth</label><input type="text" name="placeOfBirth" placeholder="e.g. Barangay Health Center" required></div>
+          <div class="form-grid">
+            <div class="field-group"><label data-i18n="baby_register.birth_weight">Birth Weight</label><input type="text" name="birthWeight" placeholder="e.g. 3.2 kg" required></div>
+            <div class="field-group"><label data-i18n="baby_register.blood_type">Blood Type (optional)</label><input type="text" name="bloodType"></div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="form-section-title"><i class="fas fa-users"></i><span data-i18n="baby_register.parent_info">Parent / Guardian Information</span></div>
+          <div class="form-grid">
+            <div class="field-group"><label data-i18n="baby_register.mother">Mother's Name</label><input type="text" name="motherName" required></div>
+            <div class="field-group"><label data-i18n="baby_register.father">Father's Name</label><input type="text" name="fatherName" required></div>
+          </div>
+          <div class="form-grid">
+            <div class="field-group"><label data-i18n="baby_register.guardian">Parent/Guardian Name</label><input type="text" name="guardianName" required></div>
+            <div class="field-group"><label data-i18n="baby_register.phone">Phone Number</label><input type="tel" name="guardianPhone" placeholder="09XX XXX XXXX" required></div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="form-section-title"><i class="fas fa-location-dot"></i><span data-i18n="baby_register.address_info">Address Information</span></div>
+          <div class="form-grid address-grid">
+            <div class="field-group address-street-field"><label data-i18n="baby_register.house_street">House No. / Street / Purok</label><input type="text" name="guardianHouseStreet" required autocomplete="address-line1"></div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="form-section-title"><i class="fas fa-hospital"></i><span data-i18n="baby_register.private_clinic_info">Private Clinic Information</span></div>
+          <label class="toggle-row">
+            <input type="checkbox" id="privateClinicToggle" name="privateClinic">
+            <span data-i18n="baby_register.private_clinic_toggle">May vaccine record from private clinic</span>
+          </label>
+          <p class="helper-text" data-i18n="baby_register.private_clinic_hint">I-check kung may bakuna si baby na nakuha outside barangay health center.</p>
+          <div class="field-group private-clinic-name hidden" id="privateClinicNameGroup"><label data-i18n="baby_register.private_clinic_name">Private Clinic Name (optional)</label><input type="text" name="privateClinicName" placeholder="Clinic name"></div>
+        </section>
+
+        <section class="form-section">
+          <div class="form-section-title"><i class="fas fa-file-upload"></i><span data-i18n="baby_register.document_info">Document Upload</span></div>
+          <div class="file-upload-card">
+            <label data-i18n="baby_register.birth_cert">Birth Certificate</label>
+            <input type="file" id="birthCert" name="document" accept=".pdf,.jpg,.jpeg,.png" required style="background: white;">
+            <p class="helper-text" data-i18n="baby_register.document_hint">PDF, JPG, or PNG only. Max file size: 5MB. Pending muna ito for BHW verification.</p>
+            <div class="upload-progress hidden" id="uploadProgressWrap" aria-label="Upload progress">
+              <div class="upload-progress-label"><span data-i18n="baby_register.upload_progress">Upload Progress</span><strong id="uploadProgressText">0%</strong></div>
+              <div class="upload-progress-track"><div id="uploadProgressBar"></div></div>
+            </div>
+            <div class="file-preview-card" id="filePreview">
+              <p class="file-preview-empty" data-i18n="baby_register.no_file">No file selected.</p>
+            </div>
+          </div>
+        </section>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top:10px;"><span data-i18n="baby_register.submit">Submit Registration</span></button>
+      </form>
+    </div>
+  </main>
+  <script type="module" src="../js/user/baby-register.js"></script>
+</body>
+</html>

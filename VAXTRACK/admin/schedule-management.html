@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en-PH">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schedules | VaxTrack</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <div id="loading-overlay" class="loading-overlay hidden"><div class="loader-box"><div class="spinner"></div><p id="loaderText">Naglo-load...</p></div></div>
+  <div id="toast-container" class="toast-container"></div>
+  <nav class="top-nav">
+    <div class="nav-container nav-actions-only dashboard-nav">
+      <div class="nav-right">
+        <div class="user-pill"><div class="avatar-circle"><i class="fas fa-user-shield"></i></div><div class="user-details"><span id="userName">Admin</span><span class="role-text" data-i18n="role.health_worker">Health Worker</span></div></div>
+        <button id="logoutBtn" class="logout-btn" aria-label="Mag-logout"><i class="fas fa-sign-out-alt"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <a href="dashboard.html" data-i18n="nav.overview"><i class="fas fa-chart-pie" style="width:25px"></i> Overview</a>
+      <a href="baby-management.html" data-i18n="nav.directory"><i class="fas fa-baby" style="width:25px"></i> Directory</a>
+      <a href="vaccination-entry.html" data-i18n="nav.log_vaccine"><i class="fas fa-syringe" style="width:25px"></i> Log Vaccine</a>
+      <a href="document-verification.html" data-i18n="nav.verify_docs"><i class="fas fa-file-contract" style="width:25px"></i> Verify Docs</a>
+      <a href="schedule-management.html" class="active" data-i18n="nav.schedules"><i class="fas fa-calendar-alt" style="width:25px"></i> Schedules</a>
+    </aside>
+    <main class="main-content" style="max-width:100%">
+      <section class="page-hero compact">
+        <div>
+          <p class="page-kicker">Schedule Management</p>
+          <h1 data-i18n="admin.schedule_management">Schedule Management</h1>
+          <p data-i18n="admin.schedule_subtitle">Review DOH vaccine guide at upcoming barangay schedules.</p>
+        </div>
+      </section>
+      <div id="scheduleArea"></div>
+    </main>
+  </div>
+  <script type="module" src="../js/admin/schedule-management.js"></script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en-PH">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BHW Dashboard | VaxTrack</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <div id="loading-overlay" class="loading-overlay hidden"><div class="loader-box"><div class="spinner"></div><p id="loaderText">Naglo-load...</p></div></div>
+  <nav class="top-nav">
+    <div class="nav-container nav-actions-only dashboard-nav">
+      <div class="nav-right">
+        <div class="user-pill"><div class="avatar-circle"><i class="fas fa-user-shield"></i></div><div class="user-details"><span id="userName">Admin</span><span class="role-text" data-i18n="role.health_worker">Health Worker</span></div></div>
+        <button id="logoutBtn" class="logout-btn" aria-label="Mag-logout"><i class="fas fa-sign-out-alt"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <a href="dashboard.html" class="active" data-i18n="nav.overview"><i class="fas fa-chart-pie" style="width:25px"></i> Overview</a>
+      <a href="baby-management.html" data-i18n="nav.directory"><i class="fas fa-baby" style="width:25px"></i> Directory</a>
+      <a href="vaccination-entry.html" data-i18n="nav.log_vaccine"><i class="fas fa-syringe" style="width:25px"></i> Log Vaccine</a>
+      <a href="document-verification.html" data-i18n="nav.verify_docs"><i class="fas fa-file-contract" style="width:25px"></i> Verify Docs</a>
+      <a href="schedule-management.html" data-i18n="nav.schedules"><i class="fas fa-calendar-alt" style="width:25px"></i> Schedules</a>
+    </aside>
+    <main class="main-content admin-overview-page" style="max-width:100%">
+      <section class="page-hero admin-overview-hero">
+        <div>
+          <p class="page-kicker" data-i18n="admin.hero_kicker">BHW Dashboard</p>
+          <h1 data-i18n="admin.hero_title">Barangay vaccination records, mas madaling i-manage</h1>
+          <p data-i18n="admin.hero_sub">Review documents, hanapin ang baby records, at i-update ang vaccination history mula sa isang organized dashboard.</p>
+        </div>
+      </section>
+
+      <div class="metric-cards">
+        <div class="card metric-card"><div class="number" id="totalBabies">0</div><span data-i18n="admin.total_registered">Total Registered</span></div>
+        <div class="card metric-card"><div class="number" id="vaccinesMonth" style="color:var(--color-success)">0</div><span data-i18n="admin.vaccines_month">Bakuna This Month</span></div>
+        <div class="card metric-card"><div class="number" id="upcomingWeek" style="color:var(--color-warning)">0</div><span data-i18n="admin.upcoming_7_days">Upcoming (7 Days)</span></div>
+        <div class="card metric-card"><div class="number" id="overdueCount" style="color:var(--color-danger)">0</div><span data-i18n="admin.overdue_alerts">Overdue Alerts</span></div>
+        <div class="card metric-card"><div class="number" id="pendingDocs" style="color:var(--color-primary)">0</div><span data-i18n="admin.pending_documents">Pending Documents</span></div>
+      </div>
+
+      <section class="overview-lower-grid" aria-label="BHW overview actions and alerts">
+        <div class="card overview-workflow-panel">
+          <h3 class="card-title">Clinic Workflow</h3>
+          <div class="admin-workflow overview-workflow" aria-label="Clinic workflow">
+            <div class="workflow-card"><i class="fas fa-file-circle-check"></i><div><strong data-i18n="nav.verify_docs">Verify Docs</strong><p data-i18n="admin.workflow_verify">Verify uploaded birth certificates</p></div></div>
+            <div class="workflow-card"><i class="fas fa-search"></i><div><strong data-i18n="nav.directory">Directory</strong><p data-i18n="admin.workflow_search">Search baby records during clinic visits</p></div></div>
+            <div class="workflow-card"><i class="fas fa-syringe"></i><div><strong data-i18n="nav.log_vaccine">Log Vaccine</strong><p data-i18n="admin.workflow_update">Update vaccine records after administration</p></div></div>
+          </div>
+        </div>
+
+        <div class="card overview-alerts-card">
+          <div class="overview-card-heading">
+            <h3 class="card-title" data-i18n="admin.urgent_alerts">Urgent Alerts</h3>
+          </div>
+          <div class="table-responsive">
+            <table id="alertsTable" class="overview-alerts-table">
+              <thead><tr><th data-i18n="table.baby_name">Baby Name</th><th data-i18n="table.vaccine">Vaccine</th><th data-i18n="table.target">Target Date</th><th data-i18n="table.status">Status</th></tr></thead>
+              <tbody id="alertsList"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script type="module" src="../js/admin/dashboard.js"></script>
+</body>
+</html>
