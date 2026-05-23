@@ -1,3 +1,4 @@
+const BASE_URL = 'https://vaxtrack-database-production.up.railway.app';
 const LOCAL_BABIES_KEY = 'vax_registered_babies';
 const DEMO_SEED_ENABLED = true; // Presentation/demo mode: set to false to restore a fully empty dashboard for new parent accounts.
 
@@ -215,6 +216,16 @@ function seedDemoBabyForCurrentParent(parentEmail) {
   writeLocalBabies(localBabies);
 }
 
+export async function getAllBabiesFromAPI() {
+  try {
+    const data = await apiFetch('/babies');
+    if (data._fallback) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
 export function getAllBabies() {
   const localBabies = readLocalBabies();
   const localIds = new Set(localBabies.map(baby => String(baby.id)));
@@ -246,7 +257,19 @@ export function isDuplicateBabyRecord(data) {
   });
 }
 
-export function registerBabyRecord(data) {
+export async function registerBabyRecord(data) {
+  // Try real backend first
+  try {
+    const result = await apiFetch('/babies', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!result._fallback) return result;
+  } catch (err) {
+    console.warn('[API] Baby register fallback to local:', err.message);
+  }
+
+  // Fallback to localStorage
   if (isDuplicateBabyRecord(data)) {
     throw new Error('Duplicate baby record detected. Pakisuri ang name, birthdate, at guardian details.');
   }
@@ -300,7 +323,19 @@ export function registerBabyRecord(data) {
   return newBaby;
 }
 
-export function updateDocumentStatus(documentId, status, comment = '') {
+export async function updateDocumentStatus(documentId, status, comment = '') {
+  // Try real backend first
+  try {
+    const result = await apiFetch(`/documents/${documentId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status, comment }),
+    });
+    if (!result._fallback) return result;
+  } catch (err) {
+    console.warn('[API] Document status fallback to local:', err.message);
+  }
+
+  // Fallback to local
   const targetId = String(documentId);
   const applyUpdate = (baby) => {
     let updated = false;
@@ -327,7 +362,19 @@ export function updateDocumentStatus(documentId, status, comment = '') {
   return updated;
 }
 
-export function addVaccinationRecord(babyId, record) {
+export async function addVaccinationRecord(babyId, record) {
+  // Try real backend first
+  try {
+    const result = await apiFetch(`/babies/${babyId}/vaccinations`, {
+      method: 'POST',
+      body: JSON.stringify(record),
+    });
+    if (!result._fallback) return result;
+  } catch (err) {
+    console.warn('[API] Vaccination fallback to local:', err.message);
+  }
+
+  // Fallback to localStorage
   const normalizedRecord = {
     ...record,
     status: 'Completed',
@@ -391,6 +438,21 @@ export function isWithinDays(dateStr, days) {
 }
 
 export async function apiFetch(endpoint, options = {}) {
-  console.log(`[API MOCK] ${options.method || 'GET'} ${endpoint}`);
-  return new Promise((resolve) => setTimeout(() => resolve({ success: true }), 600));
+  const token = localStorage.getItem('vax_token');
+  try {
+    const res = await fetch(`${BASE_URL}${endpoint}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(options.headers || {}),
+      },
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Something went wrong');
+    return data;
+  } catch (err) {
+    console.warn(`[API] Failed to reach backend, using mock fallback. Error: ${err.message}`);
+    return { success: true, _fallback: true };
+  }
 }
