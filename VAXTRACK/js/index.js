@@ -59,31 +59,45 @@ async function handleSocialAuth(provider = 'google') {
 
 document.getElementById('parentLoginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-
   const formData = new FormData(e.target);
   const email = (formData.get('email') || '').trim();
   const password = formData.get('password') || '';
-  const parentUser = validateParentCredentials(email, password);
-
-  if (!parentUser) {
-    showToast(getTranslation('auth.error_invalid_credentials'), 'error');
-    return;
-  }
 
   try {
     showLoading(getTranslation('auth.loading_authenticating'));
-    await apiFetch('/login/parent', {
-      method: 'POST',
-      body: JSON.stringify({ email, password })
-    });
 
+    // Try real backend first
+    try {
+      const data = await apiFetch('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password })
+      });
+      if (!data._fallback) {
+        localStorage.setItem('vax_token', data.token);
+        localStorage.setItem('vax_role', data.role);
+        localStorage.setItem('vax_email', data.email);
+        localStorage.setItem('vax_name', data.name);
+        localStorage.setItem('vax_id', data.id);
+        window.location.href = 'user/dashboard.html';
+        return;
+      }
+    } catch (apiErr) {
+      console.warn('[API] Login fallback to local:', apiErr.message);
+    }
+
+    // Fallback to local auth
+    const parentUser = validateParentCredentials(email, password);
+    if (!parentUser) {
+      showToast(getTranslation('auth.error_invalid_credentials'), 'error');
+      return;
+    }
     saveToken(`mock-user-token-${parentUser.id}`, 'user', getUserDisplayName(parentUser), {
       firstName: parentUser.firstName,
       lastName: parentUser.lastName,
       email: parentUser.email
     });
-
     window.location.href = 'user/dashboard.html';
+
   } catch (err) {
     showToast(err.message, 'error');
   } finally { hideLoading(); }
@@ -91,11 +105,40 @@ document.getElementById('parentLoginForm').addEventListener('submit', async (e) 
 
 document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
+  const formData = new FormData(e.target);
+  const email = (formData.get('email') || '').trim();
+  const password = formData.get('password') || '';
+
   try {
     showLoading(getTranslation('auth.loading_verifying'));
-    await apiFetch('/login/admin', { method: 'POST' });
+
+    // Try real backend first
+    try {
+      const data = await apiFetch('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password })
+      });
+      if (!data._fallback) {
+        if (data.role !== 'admin') {
+          showToast('Access denied. Admins only.', 'error');
+          return;
+        }
+        localStorage.setItem('vax_token', data.token);
+        localStorage.setItem('vax_role', data.role);
+        localStorage.setItem('vax_email', data.email);
+        localStorage.setItem('vax_name', data.name);
+        localStorage.setItem('vax_id', data.id);
+        window.location.href = 'admin/dashboard.html';
+        return;
+      }
+    } catch (apiErr) {
+      console.warn('[API] Admin login fallback to local:', apiErr.message);
+    }
+
+    // Fallback to mock admin
     saveToken('mock-admin-token', 'admin', getTranslation('role.health_worker'));
     window.location.href = 'admin/dashboard.html';
+
   } catch (err) {
     showToast(err.message, 'error');
   } finally { hideLoading(); }
@@ -128,11 +171,32 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
 
   try {
     showLoading(getTranslation('auth.loading_registering'));
-    await apiFetch('/register', {
-      method: 'POST',
-      body: JSON.stringify(registrationData)
-    });
 
+    // Try real backend first
+    try {
+      const data = await apiFetch('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({
+          ...registrationData,
+          confirmPassword: pass
+        })
+      });
+      if (!data._fallback) {
+        localStorage.setItem('vax_token', data.token);
+        localStorage.setItem('vax_role', data.role);
+        localStorage.setItem('vax_email', data.email);
+        localStorage.setItem('vax_name', data.name);
+        localStorage.setItem('vax_id', data.id);
+        showToast(getTranslation('auth.registration_success'));
+        e.target.reset();
+        toggleView('parentLoginView');
+        return;
+      }
+    } catch (apiErr) {
+      console.warn('[API] Register fallback to local:', apiErr.message);
+    }
+
+    // Fallback to local register
     const savedUser = saveParentUser(registrationData);
     if (!savedUser.success) {
       showToast(getTranslation(savedUser.messageKey), 'error');
@@ -142,6 +206,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     showToast(getTranslation('auth.registration_success'));
     e.target.reset();
     toggleView('parentLoginView');
+
   } catch (err) {
     showToast(err.message, 'error');
   } finally { hideLoading(); }
