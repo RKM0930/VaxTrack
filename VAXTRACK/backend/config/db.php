@@ -17,7 +17,13 @@ function getDB() {
       ]);
     } catch (PDOException $e) {
       http_response_code(500);
-      echo json_encode(['error' => 'Database connection failed']);
+      echo json_encode([
+        'error' => 'Database connection failed',
+        'detail' => $e->getMessage(),
+        'host' => DB_HOST,
+        'port' => DB_PORT,
+        'db' => DB_NAME
+      ]);
       exit;
     }
   }
