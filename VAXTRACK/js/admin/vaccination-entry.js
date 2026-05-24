@@ -127,7 +127,7 @@ function renderLogTableRows() {
       <td><span class="admin-mono vaccine-log-batch">${escapeHtml(log.batchNo)}</span></td>
       <td><span class="vaccine-log-worker">${escapeHtml(log.administeredBy || '-')}</span></td>
       <td>
-        ${log.reaction ? `<span class="reaction-summary" title="${escapeHtml(log.reaction)}"><span class="reaction-flag"><i class="fas fa-exclamation-triangle"></i></span><span>${escapeHtml(log.reaction)}</span></span>` : '<span class="admin-muted">-</span>'}
+        ${log.reaction ? `<span class="status-summary-cell reaction-summary" title="${escapeHtml(log.reaction)}"><span class="reaction-flag"><i class="fas fa-exclamation-triangle"></i></span><span>${escapeHtml(log.reaction)}</span></span>` : '<span class="admin-muted">-</span>'}
       </td>
     </tr>
   `).join('');
@@ -353,13 +353,13 @@ function renderSelectedBabyScheduleHtml(babyId) {
         <strong>${escapeHtml(baby.name)}</strong>
         <span>${escapeHtml(baby.registrationNumber || '-')}</span>
       </div>
-      <span class="badge ${statusClass(baby.registrationStatus || 'Pending')}">${escapeHtml(baby.registrationStatus || 'Pending')}</span>
+      <span class="status-summary-cell"><span class="badge status-badge ${statusClass(baby.registrationStatus || 'Pending')}">${escapeHtml(baby.registrationStatus || 'Pending')}</span></span>
     </div>
     <div class="schedule-list admin-modal-schedule-list">
       ${schedules.length ? schedules.map(item => `
         <div class="schedule-item">
           <div><strong>${escapeHtml(item.vaccine)}</strong><br><small>Target: ${formatDate(item.targetDate)}</small></div>
-          <span class="badge ${statusClass(item.status || 'Upcoming')}">${escapeHtml(item.status || 'Upcoming')}</span>
+          <span class="status-summary-cell"><span class="badge status-badge ${statusClass(item.status || 'Upcoming')}">${escapeHtml(item.status || 'Upcoming')}</span></span>
         </div>
       `).join('') : `<div class="empty-state compact-empty">${getTranslation('profile.no_upcoming')}</div>`}
     </div>

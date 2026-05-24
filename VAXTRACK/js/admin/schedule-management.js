@@ -81,7 +81,7 @@ function buildScheduleItem(event, options = {}) {
         </div>
       </div>
       <div class="admin-event-actions">
-        <span class="badge ${statusClass(event.status)}">${event.status}</span>
+        <span class="status-summary-cell admin-event-status-summary"><span class="badge status-badge ${statusClass(event.status)}">${event.status}</span></span>
         <button type="button" class="btn btn-outline btn-sm schedule-edit-btn"><i class="fas fa-edit"></i> Edit</button>
       </div>
     </div>
@@ -145,7 +145,7 @@ function renderSchedules() {
           <table class="admin-data-table compact-table">
             <thead><tr><th>Vaccine</th><th>Target Age</th><th>Dose</th><th>Status</th></tr></thead>
             <tbody>
-              ${dohSchedule.map(item => `<tr><td><strong>${item.vaccine}</strong></td><td>${item.targetAge}</td><td>${item.dose}</td><td><span class="badge approved">Active</span></td></tr>`).join('')}
+              ${dohSchedule.map(item => `<tr><td><strong>${item.vaccine}</strong></td><td>${item.targetAge}</td><td>${item.dose}</td><td><span class="status-summary-cell"><span class="badge status-badge approved active">Active</span></span></td></tr>`).join('')}
             </tbody>
           </table>
         </div>

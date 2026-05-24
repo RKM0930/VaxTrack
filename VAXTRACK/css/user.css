@@ -7,7 +7,7 @@
 .auth-left { flex: 0.8; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 42px 40px; text-align: center; }
 .auth-left h1 { font-size: 2.35rem; font-weight: 700; line-height: 1.05; margin-bottom: 6px; letter-spacing: -0.8px; }
 .auth-divider { width: min(220px, 72%); height: 2px; background: rgba(255,255,255,0.38); border-radius: 999px; margin-bottom: 16px; }
-.auth-logo { width: 124px; height: 124px; object-fit: contain; margin-bottom: 14px; }
+.auth-logo { width: 164px; height: 164px; object-fit: contain; margin-bottom: 18px; }
 .auth-tagline { color: rgba(255,255,255,0.82); font-size: 0.95rem; font-weight: 300; line-height: 1.35; letter-spacing: 0.2px; white-space: nowrap; margin: 0; }
 .auth-right { flex: 1.2; padding: 50px; display: flex; flex-direction: column; justify-content: center; }
 
@@ -131,7 +131,7 @@ button.secondary-link:active {
 
 @media (max-width: 768px) {
     .auth-left { padding: 34px 24px; }
-    .auth-logo { width: 88px; height: 88px; margin-bottom: 12px; }
+    .auth-logo { width: 116px; height: 116px; margin-bottom: 14px; }
     .auth-divider { width: min(190px, 72%); margin-bottom: 14px; }
     .auth-left h1 { font-size: 2.25rem; margin-bottom: 5px; }
     .auth-tagline { font-size: 0.85rem; white-space: normal; }

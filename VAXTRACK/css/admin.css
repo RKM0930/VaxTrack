@@ -2828,3 +2828,280 @@
     align-self: center;
   }
 }
+
+/* --- Scrollable admin table and list areas --- */
+.admin-layout .admin-table-shell,
+.admin-layout .admin-action-table-responsive {
+  position: relative;
+  max-height: clamp(300px, 54vh, 560px);
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.admin-layout .admin-data-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.admin-layout .admin-table-shell .admin-data-table thead th,
+.admin-layout .admin-action-table-responsive .admin-data-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  background: #f1f7fb !important;
+  box-shadow: 0 1px 0 #dbe7ef;
+}
+
+.admin-layout .admin-table-shell .admin-data-table th,
+.admin-layout .admin-table-shell .admin-data-table td,
+.admin-layout .admin-action-table-responsive .admin-data-table th,
+.admin-layout .admin-action-table-responsive .admin-data-table td {
+  vertical-align: middle !important;
+}
+
+.admin-layout .admin-table-shell .admin-data-table tbody tr,
+.admin-layout .admin-action-table-responsive .admin-data-table tbody tr {
+  height: auto;
+}
+
+.admin-layout .admin-table-shell .admin-data-table .badge,
+.admin-layout .admin-table-shell .admin-data-table .btn,
+.admin-layout .admin-table-shell .admin-data-table button,
+.admin-layout .admin-action-table-responsive .admin-data-table .badge,
+.admin-layout .admin-action-table-responsive .admin-data-table .btn,
+.admin-layout .admin-action-table-responsive .admin-data-table button {
+  vertical-align: middle;
+}
+
+.admin-overview-page .admin-action-table-responsive {
+  max-height: clamp(260px, 42vh, 430px);
+}
+
+.admin-directory-page .admin-table-shell {
+  max-height: clamp(360px, calc(100vh - 240px), 640px);
+}
+
+.admin-vaccine-page .admin-table-shell {
+  max-height: clamp(340px, calc(100vh - 330px), 590px);
+}
+
+.admin-docs-page .admin-table-shell {
+  max-height: clamp(340px, calc(100vh - 230px), 610px);
+}
+
+.admin-schedule-page .admin-table-shell {
+  max-height: clamp(260px, 42vh, 420px);
+}
+
+.admin-schedule-page .admin-event-list-scroll {
+  max-height: clamp(300px, calc(100vh - 260px), 500px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.admin-layout .admin-table-shell::-webkit-scrollbar,
+.admin-layout .admin-action-table-responsive::-webkit-scrollbar,
+.admin-schedule-page .admin-event-list-scroll::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+.admin-layout .admin-table-shell::-webkit-scrollbar-thumb,
+.admin-layout .admin-action-table-responsive::-webkit-scrollbar-thumb,
+.admin-schedule-page .admin-event-list-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+.admin-layout .admin-table-shell::-webkit-scrollbar-track,
+.admin-layout .admin-action-table-responsive::-webkit-scrollbar-track,
+.admin-schedule-page .admin-event-list-scroll::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+@media (max-width: 900px) {
+  .admin-directory-page .admin-table-shell,
+  .admin-vaccine-page .admin-table-shell,
+  .admin-docs-page .admin-table-shell {
+    max-height: clamp(320px, calc(100vh - 220px), 560px);
+  }
+
+  .admin-overview-page .admin-action-table-responsive {
+    max-height: 420px;
+  }
+}
+
+@media (max-width: 680px) {
+  .admin-layout .admin-action-table-responsive {
+    max-height: 430px;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  .admin-layout .admin-table-shell {
+    max-height: 430px;
+  }
+
+  .admin-schedule-page .admin-event-list-scroll {
+    max-height: 380px;
+  }
+}
+
+/* --- Consistent status summary alignment across admin tables --- */
+.admin-layout .status-summary-cell,
+.modal-backdrop .status-summary-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  white-space: nowrap;
+  vertical-align: middle;
+  line-height: 1;
+  min-height: 24px;
+}
+
+.admin-layout .status-summary-cell .badge,
+.admin-layout .status-summary-cell .status-badge,
+.modal-backdrop .status-summary-cell .badge,
+.modal-backdrop .status-summary-cell .status-badge {
+  flex: 0 0 auto;
+}
+
+.admin-layout .status-text,
+.modal-backdrop .status-text {
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 650;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.admin-layout .badge,
+.modal-backdrop .badge {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  padding: 4px 9px !important;
+  border-radius: 999px !important;
+  font-size: 0.68rem !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.admin-layout .badge.pending,
+.admin-layout .badge.pending-docs,
+.admin-layout .badge.pending-review,
+.admin-layout .badge.action-required,
+.admin-layout .badge.missed-follow-up,
+.admin-layout .badge.re-upload-requested,
+.modal-backdrop .badge.pending,
+.modal-backdrop .badge.pending-docs,
+.modal-backdrop .badge.pending-review,
+.modal-backdrop .badge.action-required,
+.modal-backdrop .badge.missed-follow-up,
+.modal-backdrop .badge.re-upload-requested {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.admin-layout .badge.overdue,
+.admin-layout .badge.danger,
+.admin-layout .badge.flagged,
+.admin-layout .badge.rejected,
+.admin-layout .badge.rejected-docs,
+.modal-backdrop .badge.overdue,
+.modal-backdrop .badge.danger,
+.modal-backdrop .badge.flagged,
+.modal-backdrop .badge.rejected,
+.modal-backdrop .badge.rejected-docs {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.admin-layout .badge.completed,
+.admin-layout .badge.success,
+.admin-layout .badge.approved,
+.admin-layout .badge.fully-vaccinated,
+.admin-layout .badge.up-to-date,
+.admin-layout .badge.active,
+.modal-backdrop .badge.completed,
+.modal-backdrop .badge.success,
+.modal-backdrop .badge.approved,
+.modal-backdrop .badge.fully-vaccinated,
+.modal-backdrop .badge.up-to-date,
+.modal-backdrop .badge.active {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.admin-layout .badge.due-soon,
+.admin-layout .badge.upcoming,
+.modal-backdrop .badge.due-soon,
+.modal-backdrop .badge.upcoming {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.admin-data-table td .status-summary-cell,
+.admin-action-items-table td .status-summary-cell,
+.admin-masterlist-table td .status-summary-cell,
+.admin-doc-review-table td .status-summary-cell,
+.compact-table td .status-summary-cell {
+  width: max-content;
+  max-width: 100%;
+}
+
+.admin-masterlist-table .directory-status-line {
+  gap: 10px !important;
+}
+
+.admin-masterlist-table .directory-status-detail,
+.admin-masterlist-table .status-text {
+  font-size: 0.76rem;
+}
+
+.admin-action-items-table td[data-label="Status"],
+.admin-doc-review-table td:nth-child(4),
+.admin-masterlist-table td:nth-child(6),
+.compact-table td:last-child {
+  white-space: nowrap;
+}
+
+.admin-action-items-table td[data-label="Status"] .status-summary-cell,
+.admin-doc-review-table td:nth-child(4) .status-summary-cell,
+.admin-masterlist-table td:nth-child(6) .status-summary-cell,
+.compact-table td:last-child .status-summary-cell {
+  align-items: center;
+}
+
+.admin-event-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-event-status-summary {
+  flex-shrink: 0;
+}
+
+.reaction-summary {
+  gap: 8px !important;
+}
+
+.reaction-summary .reaction-flag {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 680px) {
+  .admin-action-items-table td .status-summary-cell,
+  .admin-doc-review-table td .status-summary-cell {
+    justify-content: flex-end;
+  }
+}

@@ -113,7 +113,7 @@ function renderDocs() {
       </td>
       <td><strong>${escapeHtml(doc.baby?.name || 'Unknown baby')}</strong><br><small class="admin-muted">${escapeHtml(doc.baby?.registrationNumber || '-')}</small></td>
       <td>${formatDate(doc.uploadDate)}</td>
-      <td><span class="badge ${statusClass(doc.displayStatus)}">${escapeHtml(doc.displayStatus)}</span></td>
+      <td><span class="status-summary-cell"><span class="badge status-badge ${statusClass(doc.displayStatus)}">${escapeHtml(doc.displayStatus)}</span></span></td>
       <td>
         <button type="button" class="btn btn-outline btn-sm review-doc-btn" data-id="${escapeHtml(doc.id)}"><i class="fas fa-clipboard-check"></i> Review</button>
       </td>
@@ -157,7 +157,7 @@ function buildReviewModal(doc) {
       </div>
 
       <div class="admin-doc-review-status-row">
-        <span class="badge ${statusClass(displayStatus)}">${escapeHtml(displayStatus)}</span>
+        <span class="status-summary-cell"><span class="badge status-badge ${statusClass(displayStatus)}">${escapeHtml(displayStatus)}</span></span>
         ${doc.comment ? `<span class="admin-muted">Last remark available below</span>` : `<span class="admin-muted">No admin/BHW remark yet</span>`}
       </div>
 

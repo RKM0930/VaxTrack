@@ -243,8 +243,10 @@ function openBabyRecordModal(babyId) {
       </div>
 
       <div class="admin-record-modal-summary">
-        <span class="badge ${summary.badge}">${displayValue(summary.label, 'Status')}</span>
-        <span>${displayValue(summary.detail, 'No current action needed')}</span>
+        <span class="status-summary-cell">
+          <span class="badge status-badge ${summary.badge}">${displayValue(summary.label, 'Status')}</span>
+          <span class="status-text">${displayValue(summary.detail, 'No current action needed')}</span>
+        </span>
         <a class="btn btn-primary btn-sm" href="vaccination-entry.html?baby=${encodeURIComponent(baby.id)}"><i class="fas fa-syringe"></i> ${getTranslation('nav.log_vaccine')}</a>
       </div>
 
@@ -349,9 +351,9 @@ function renderDirectory() {
       <td><span class="directory-secondary-text">${displayValue(baby.guardianName)}</span></td>
       <td><span class="directory-secondary-text">${displayValue(baby.guardianPhone)}</span></td>
       <td>
-        <span class="directory-status-line">
-          <span class="badge ${summary.badge}">${displayValue(summary.label, 'Status')}</span>
-          <span class="directory-status-detail">${displayValue(summary.detail, '')}</span>
+        <span class="status-summary-cell directory-status-line">
+          <span class="badge status-badge ${summary.badge}">${displayValue(summary.label, 'Status')}</span>
+          <span class="status-text directory-status-detail">${displayValue(summary.detail, '')}</span>
         </span>
       </td>
     </tr>

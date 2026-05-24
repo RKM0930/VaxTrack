@@ -212,7 +212,7 @@ function renderMedicalAlerts() {
       <td data-label="Baby Name"><strong>${alert.baby}</strong><br><small class="admin-muted">${alert.regNo}</small></td>
       <td data-label="Medical Item">${alert.item}</td>
       <td data-label="Target Date">${formatDate(alert.date)}</td>
-      <td data-label="Status"><span class="badge ${statusClass(alert.status)}">${alert.status}</span></td>
+      <td data-label="Status"><span class="status-summary-cell"><span class="badge status-badge ${statusClass(alert.status)}">${alert.status}</span></span></td>
       <td data-label="Action" class="text-right"><a class="btn btn-outline btn-sm" href="${alert.actionUrl}">${alert.actionLabel}</a></td>
     </tr>
   `).join('');
@@ -236,7 +236,7 @@ function renderDocumentActionItems() {
       <td data-label="Baby Name"><strong>${action.baby}</strong><br><small class="admin-muted">${action.regNo}</small></td>
       <td data-label="Document">${action.item}</td>
       <td data-label="Date Uploaded">${formatDate(action.date)}</td>
-      <td data-label="Status"><span class="badge ${statusClass(action.status)}">${action.status}</span></td>
+      <td data-label="Status"><span class="status-summary-cell"><span class="badge status-badge ${statusClass(action.status)}">${action.status}</span></span></td>
       <td data-label="Action" class="text-right"><a class="btn btn-outline btn-sm" href="${action.actionUrl}">${action.actionLabel}</a></td>
     </tr>
   `).join('');
