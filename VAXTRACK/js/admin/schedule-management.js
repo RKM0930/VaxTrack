@@ -1,13 +1,20 @@
 import { requireAdminAuth, setupNav } from '../auth.js';
-import { dohSchedule, getAllBabies } from '../api.js';
+import { dohSchedule, apiFetch, getAllBabies } from '../api.js';
 import { showLoading, hideLoading, formatDate, statusClass, sortByDateAsc } from '../utils.js';
 import { setupI18n, getTranslation } from '../i18n.js';
 
 requireAdminAuth();
 
+let allSchedules = [];
+
 function renderSchedules() {
   const area = document.getElementById('scheduleArea');
-  const upcoming = sortByDateAsc(getAllBabies().flatMap(baby => (baby.upcoming || []).map(item => ({ ...item, babyName: baby.name, regNo: baby.registrationNumber }))), 'targetDate');
+  const upcoming = sortByDateAsc(allSchedules.map(item => ({
+    ...item,
+    targetDate: item.targetDate || item.target_date,
+    babyName: item.babyName || `${item.first_name} ${item.last_name}`.trim(),
+    regNo: item.regNo || item.registration_number,
+  })), 'targetDate');
 
   area.innerHTML = `
     <div class="admin-two-column">
@@ -37,9 +44,29 @@ function renderSchedules() {
   `;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   setupNav();
   setupI18n();
   showLoading();
-  setTimeout(() => { renderSchedules(); hideLoading(); }, 300);
+
+  try {
+    const data = await apiFetch('/schedules');
+    if (data && Array.isArray(data)) {
+      allSchedules = data;
+    } else {
+      throw new Error('Fallback');
+    }
+  } catch (err) {
+    console.warn('[API] Falling back to mock schedules:', err.message);
+    allSchedules = getAllBabies().flatMap(baby =>
+      (baby.upcoming || []).map(item => ({
+        ...item,
+        babyName: baby.name,
+        registration_number: baby.registrationNumber,
+      }))
+    );
+  }
+
+  renderSchedules();
+  hideLoading();
 });
