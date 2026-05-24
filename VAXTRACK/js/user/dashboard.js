@@ -1,5 +1,5 @@
 import { requireAuth, setupNav } from '../auth.js';
-import { getBabiesForCurrentParent, getCompletionProgress, isWithinDays } from '../api.js';
+import { apiFetch, getBabiesForCurrentParent, getCompletionProgress, isWithinDays } from '../api.js';
 import { showLoading, hideLoading, formatBabyAge, formatValue, formatDate, statusClass, sortByDateAsc, sortByDateDesc, openDocumentModal } from '../utils.js';
 import { setupI18n, getTranslation } from '../i18n.js';
 
@@ -1415,7 +1415,7 @@ function renderBabyRecord(baby) {
   bindVaccinationHistoryControls(baby);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   setupNav();
   setupI18n();
   bindBabyRecordsOverlayControls();
@@ -1424,16 +1424,59 @@ document.addEventListener('DOMContentLoaded', () => {
   applyBabyRecordsOverlayState();
   applyDocumentsOverlayState(false);
   showLoading();
-  setTimeout(() => {
-    cachedBabies = getBabiesForCurrentParent();
+
+  try {
+    // Try real backend first
+    try {
+      const data = await apiFetch('/babies');
+      if (data && !data._fallback && Array.isArray(data)) {
+        // Normalize API data to match frontend expected format
+        cachedBabies = data.map(baby => ({
+          ...baby,
+          name: baby.name || `${baby.first_name} ${baby.middle_name || ''} ${baby.last_name}`.trim(),
+          registrationNumber: baby.registrationNumber || baby.registration_number,
+          registrationStatus: baby.registrationStatus || baby.registration_status,
+          guardianName: baby.guardianName || baby.guardian_name,
+          guardianPhone: baby.guardianPhone || baby.guardian_phone,
+          guardianAddress: baby.guardianAddress || baby.guardian_address,
+          motherName: baby.motherName || baby.mother_name,
+          fatherName: baby.fatherName || baby.father_name,
+          placeOfBirth: baby.placeOfBirth || baby.place_of_birth,
+          birthWeight: baby.birthWeight || baby.birth_weight,
+          bloodType: baby.bloodType || baby.blood_type,
+          privateClinic: baby.privateClinic ?? Boolean(baby.private_clinic),
+          privateClinicName: baby.privateClinicName || baby.private_clinic_name,
+          upcoming: (baby.upcoming || []).map(u => ({
+            ...u,
+            targetDate: u.targetDate || u.target_date,
+          })),
+          documents: (baby.documents || []).map(d => ({
+            ...d,
+            uploadDate: d.uploadDate || d.upload_date,
+          })),
+        }));
+      } else {
+        throw new Error('Fallback to local');
+      }
+    } catch (err) {
+      console.warn('[API] Falling back to local babies:', err.message);
+      cachedBabies = getBabiesForCurrentParent();
+    }
+
     const approvedBaby = cachedBabies.find(baby => isApprovedStatus(getRegistrationStatus(baby)));
     selectedBabyId = approvedBaby?.id || cachedBabies[0]?.id || null;
     renderBabyList(cachedBabies);
+
     if (!cachedBabies.length) {
       renderNoBabyState();
     } else {
       renderBabyRecord(cachedBabies.find(baby => String(baby.id) === String(selectedBabyId)));
     }
+  } catch (err) {
+    console.error('Dashboard error:', err);
+    cachedBabies = getBabiesForCurrentParent();
+    renderNoBabyState();
+  } finally {
     hideLoading();
-  }, 300);
+  }
 });
