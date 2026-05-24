@@ -6,4 +6,4 @@ WORKDIR /app
 
 COPY . .
 
-CMD ["sh", "-c", "php -S 0.0.0.0:$PORT -t /app/backend"]
+CMD ["sh", "-c", "php -S 0.0.0.0:$PORT -t /app/backend index.php"]
