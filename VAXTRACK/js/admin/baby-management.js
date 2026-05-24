@@ -1,18 +1,45 @@
 import { requireAdminAuth, setupNav } from '../auth.js';
-import { getAllBabies } from '../api.js';
+import { apiFetch, getAllBabies } from '../api.js';
 import { showLoading, hideLoading, formatBabyAge, formatValue, formatDate, statusClass, sortByDateAsc, sortByDateDesc, openDocumentModal } from '../utils.js';
 import { setupI18n, getTranslation } from '../i18n.js';
 
 requireAdminAuth();
 
+const normalize = (baby) => ({
+  ...baby,
+  name: baby.name || `${baby.first_name} ${baby.middle_name || ''} ${baby.last_name}`.trim(),
+  registrationNumber: baby.registrationNumber || baby.registration_number,
+  registrationStatus: baby.registrationStatus || baby.registration_status,
+  guardianName: baby.guardianName || baby.guardian_name,
+  guardianPhone: baby.guardianPhone || baby.guardian_phone,
+  guardianAddress: baby.guardianAddress || baby.guardian_address,
+  motherName: baby.motherName || baby.mother_name,
+  fatherName: baby.fatherName || baby.father_name,
+  placeOfBirth: baby.placeOfBirth || baby.place_of_birth,
+  birthWeight: baby.birthWeight || baby.birth_weight,
+  bloodType: baby.bloodType || baby.blood_type,
+  privateClinic: baby.privateClinic ?? Boolean(baby.private_clinic),
+  privateClinicName: baby.privateClinicName || baby.private_clinic_name,
+  upcoming: (baby.upcoming || []).map(u => ({
+    ...u,
+    targetDate: u.targetDate || u.target_date,
+  })),
+  documents: (baby.documents || []).map(d => ({
+    ...d,
+    uploadDate: d.uploadDate || d.upload_date,
+  })),
+});
+
+let allBabies = [];
+
 function getNextSchedule(baby) {
   return sortByDateAsc((baby.upcoming || []).filter(item => item.status !== 'Completed'), 'targetDate')[0] || { vaccine: getTranslation('dashboard.up_to_date'), targetDate: '-', status: 'Completed' };
 }
-
+s
 function renderDirectory(query = '') {
   const list = document.getElementById('directoryList');
   const normalized = query.trim().toLowerCase();
-  const babies = getAllBabies().filter(baby => {
+  const babies = allBabies.filter(baby => {
     if (!normalized) return true;
     return [baby.name, baby.registrationNumber, baby.guardianName, baby.motherName, baby.fatherName]
       .some(value => String(value || '').toLowerCase().includes(normalized));
@@ -86,14 +113,25 @@ function renderDirectory(query = '') {
   });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   setupNav();
   setupI18n();
   showLoading();
-  setTimeout(() => {
-    renderDirectory();
-    const search = document.getElementById('adminBabySearch');
-    search.addEventListener('input', (event) => renderDirectory(event.target.value));
-    hideLoading();
-  }, 300);
+
+  try {
+    const data = await apiFetch('/babies');
+    if (data && Array.isArray(data)) {
+      allBabies = data.map(normalize);
+    } else {
+      throw new Error('Fallback');
+    }
+  } catch (err) {
+    console.warn('[API] Falling back to mock babies:', err.message);
+    allBabies = getAllBabies();
+  }
+
+  renderDirectory();
+  const search = document.getElementById('adminBabySearch');
+  search?.addEventListener('input', (event) => renderDirectory(event.target.value));
+  hideLoading();
 });
