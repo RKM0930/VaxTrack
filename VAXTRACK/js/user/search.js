@@ -1,16 +1,38 @@
 import { requireAuth, setupNav } from '../auth.js';
-import { getAllBabies } from '../api.js';
+import { apiFetch } from '../api.js';
 import { setupI18n, getTranslation } from '../i18n.js';
 
 requireAuth();
+
+let babies = [];
 
 function statusClass(status = '') {
   return status.toLowerCase().replace(/\s+/g, '-');
 }
 
+function normalizeBaby(baby = {}) {
+  return {
+    ...baby,
+    name: baby.name || [baby.first_name, baby.middle_name, baby.last_name].filter(Boolean).join(' ').trim(),
+    registrationNumber: baby.registrationNumber || baby.registration_number,
+    registrationStatus: baby.registrationStatus || baby.registration_status,
+    motherName: baby.motherName || baby.mother_name || '',
+    documents: baby.documents || []
+  };
+}
+
+async function loadBabies() {
+  try {
+    const data = await apiFetch('/babies');
+    babies = Array.isArray(data) ? data.map(normalizeBaby) : [];
+  } catch (err) {
+    console.warn('[API] Unable to load search records from database:', err.message);
+    babies = [];
+  }
+}
+
 function filterBabies(query) {
   const results = document.getElementById('searchResults');
-  const babies = getAllBabies();
   if (!results) return;
 
   if (!query.trim()) {
@@ -20,7 +42,7 @@ function filterBabies(query) {
 
   const normalized = query.toLowerCase();
   const filtered = babies.filter(b => 
-    b.name.toLowerCase().includes(normalized) ||
+    (b.name || '').toLowerCase().includes(normalized) ||
     (b.registrationNumber || '').toLowerCase().includes(normalized)
   );
   
@@ -50,9 +72,10 @@ function filterBabies(query) {
   }).join('');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   setupNav();
   setupI18n();
+  await loadBabies();
   const input = document.getElementById('searchInput');
   input.addEventListener('input', (e) => filterBabies(e.target.value));
 });

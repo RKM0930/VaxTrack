@@ -1,11 +1,30 @@
 import { requireAdminAuth, setupNav } from '../auth.js';
-import { dohSchedule, getAllBabies } from '../api.js';
+import { apiFetch, dohSchedule } from '../api.js';
 import { showLoading, hideLoading, showToast, statusClass, sortByDateAsc } from '../utils.js';
 import { setupI18n } from '../i18n.js';
 
 requireAdminAuth();
 
 let scheduleEvents = [];
+let allBabies = [];
+
+
+function normalizeBabyRecord(baby = {}) {
+  return {
+    ...baby,
+    name: baby.name || [baby.first_name, baby.middle_name, baby.last_name].filter(Boolean).join(' ').trim(),
+    registrationNumber: baby.registrationNumber || baby.registration_number,
+    upcoming: (baby.upcoming || []).map(item => ({
+      ...item,
+      targetDate: item.targetDate || item.target_date,
+    }))
+  };
+}
+
+async function loadSchedulesFromDatabase() {
+  const data = await apiFetch('/babies');
+  allBabies = Array.isArray(data) ? data.map(normalizeBabyRecord) : [];
+}
 
 function getScheduleMonthDay(dateValue) {
   if (!dateValue) return { month: 'TBD', day: '--' };
@@ -18,7 +37,7 @@ function getScheduleMonthDay(dateValue) {
 }
 
 function buildBarangayEvents() {
-  const upcoming = sortByDateAsc(getAllBabies().flatMap(baby => (baby.upcoming || [])
+  const upcoming = sortByDateAsc(allBabies.flatMap(baby => (baby.upcoming || [])
     .filter(item => String(item.status || '').toLowerCase() !== 'completed')
     .map(item => ({ ...item, babyName: baby.name, regNo: baby.registrationNumber }))), 'targetDate');
 
@@ -143,9 +162,16 @@ function renderSchedules() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   setupNav();
   setupI18n();
   showLoading();
-  setTimeout(() => { renderSchedules(); hideLoading(); }, 300);
+  try {
+    await loadSchedulesFromDatabase();
+  } catch (err) {
+    console.warn('[API] Unable to load schedules from database:', err.message);
+    allBabies = [];
+  }
+  renderSchedules();
+  hideLoading();
 });

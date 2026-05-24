@@ -1,5 +1,5 @@
 import { requireAuth, setupNav } from '../auth.js';
-import { apiFetch, getBabiesForCurrentParent, getCompletionProgress, isWithinDays } from '../api.js';
+import { apiFetch, getCompletionProgress, isWithinDays } from '../api.js';
 import { showLoading, hideLoading, formatBabyAge, formatValue, formatDate, statusClass, sortByDateAsc, sortByDateDesc, openDocumentModal } from '../utils.js';
 import { setupI18n, getTranslation } from '../i18n.js';
 
@@ -369,7 +369,7 @@ function applyDocumentsOverlayState(open = documentsOverlayOpen) {
   const panel = document.getElementById('documentsPanel');
   const trigger = document.getElementById('documentsTrigger');
   const selectedBaby = cachedBabies.find(baby => String(baby.id) === String(selectedBabyId));
-  const canOpenDocuments = Boolean(selectedBabyId && selectedBaby && isApprovedStatus(getRegistrationStatus(selectedBaby)));
+  const canOpenDocuments = Boolean(selectedBabyId && selectedBaby);
 
   documentsOverlayOpen = open && canOpenDocuments;
   panel?.classList.toggle('hidden', !documentsOverlayOpen);
@@ -450,6 +450,108 @@ function getStatusLabel(status) {
 
 function isApprovedStatus(status) {
   return String(status || '').toLowerCase() === 'approved';
+}
+
+function cleanIdentity(value = '') {
+  return String(value || '').trim().toLowerCase();
+}
+
+function getCurrentParentIdentity() {
+  return {
+    id: cleanIdentity(localStorage.getItem('vax_id') || ''),
+    email: cleanIdentity(localStorage.getItem('vax_email') || '')
+  };
+}
+
+function normalizeRegistrationStatus(status = 'Pending') {
+  const value = String(status || 'Pending').trim().toLowerCase();
+  if (value === 'approved') return 'Approved';
+  if (value === 'rejected') return 'Rejected';
+  return 'Pending';
+}
+
+function normalizeDocumentRecord(doc = {}, fallbackStatus = 'Pending') {
+  return {
+    ...doc,
+    id: doc.id || doc.documentId || doc.document_id || doc.filename || doc.file_path,
+    type: doc.type || 'Birth Certificate',
+    filename: doc.filename || doc.fileName || doc.file_name || doc.file_path || 'Birth Certificate',
+    mimeType: doc.mimeType || doc.mime_type || '',
+    uploadDate: doc.uploadDate || doc.upload_date || doc.createdAt || doc.created_at || doc.reviewedDate || doc.reviewed_date || '',
+    status: normalizeRegistrationStatus(doc.status || fallbackStatus),
+    comment: doc.comment || doc.remarks || doc.reason || ''
+  };
+}
+
+function normalizeBabyRecord(baby = {}) {
+  const firstName = baby.firstName || baby.first_name || '';
+  const middleName = baby.middleName || baby.middle_name || '';
+  const lastName = baby.lastName || baby.last_name || '';
+  const fallbackName = [firstName, middleName, lastName].filter(Boolean).join(' ').trim();
+  const status = normalizeRegistrationStatus(baby.registrationStatus || baby.registration_status || baby.status || baby.documents?.[0]?.status || 'Pending');
+
+  return {
+    ...baby,
+    id: baby.id || baby.childId || baby.child_id,
+    userId: baby.userId || baby.user_id || baby.parentId || baby.parent_id || '',
+    parentId: baby.parentId || baby.parent_id || baby.userId || baby.user_id || '',
+    parentEmail: baby.parentEmail || baby.parent_email || '',
+    firstName,
+    middleName,
+    lastName,
+    name: baby.name || fallbackName,
+    registrationNumber: baby.registrationNumber || baby.registration_number,
+    registrationStatus: status,
+    status,
+    guardianName: baby.guardianName || baby.guardian_name,
+    guardianPhone: baby.guardianPhone || baby.guardian_phone,
+    guardianAddress: baby.guardianAddress || baby.guardian_address || baby.guardianHouseStreet || '',
+    motherName: baby.motherName || baby.mother_name,
+    fatherName: baby.fatherName || baby.father_name,
+    placeOfBirth: baby.placeOfBirth || baby.place_of_birth,
+    birthWeight: baby.birthWeight || baby.birth_weight,
+    bloodType: baby.bloodType || baby.blood_type,
+    privateClinic: baby.privateClinic ?? Boolean(baby.private_clinic),
+    privateClinicName: baby.privateClinicName || baby.private_clinic_name,
+    upcoming: (baby.upcoming || []).map(u => ({
+      ...u,
+      targetDate: u.targetDate || u.target_date,
+      source: u.source || u.clinicName || u.clinic_name || 'Barangay Health Center'
+    })),
+    vaccinations: (baby.vaccinations || []).map(v => ({
+      ...v,
+      date: v.date || v.created_at,
+      batch: v.batch || v.batch_number || v.lot_number,
+      worker: v.worker || v.administeredBy || v.administered_by || v.health_worker,
+      privateClinic: v.privateClinic ?? Boolean(v.private_clinic),
+      clinicName: v.clinicName || v.clinic_name,
+      status: v.status || 'Completed'
+    })),
+    documents: (baby.documents || []).map(doc => normalizeDocumentRecord(doc, status)),
+    testHistory: (baby.testHistory || baby.test_history || []).map(item => ({
+      ...item,
+      date: item.date || item.created_at
+    }))
+  };
+}
+
+function babyBelongsToCurrentParent(baby = {}) {
+  const current = getCurrentParentIdentity();
+  const babyEmail = cleanIdentity(baby.parentEmail || baby.parent_email);
+  const babyParentId = cleanIdentity(baby.parentId || baby.parent_id || baby.userId || baby.user_id);
+
+  if (current.email && babyEmail) return babyEmail === current.email;
+  if (current.id && babyParentId) return babyParentId === current.id;
+
+  // The backend already filters parent /babies responses. If no owner field is
+  // present, keep the record instead of accidentally hiding pending babies.
+  return true;
+}
+
+function getRequestedSelectedBabyId() {
+  const id = sessionStorage.getItem('vax_selected_baby_id');
+  if (id) sessionStorage.removeItem('vax_selected_baby_id');
+  return id;
 }
 
 
@@ -637,6 +739,7 @@ function renderRegistrationStatusState(baby) {
           <p>${message}</p>
           <div class="registration-status-details">
             <div><span>${getTranslation('table.document')}</span><strong>${formatValue(primaryDoc.type || 'Birth Certificate')}</strong></div>
+            <div><span>File Name</span><strong>${formatValue(primaryDoc.filename, '-')}</strong></div>
             <div><span>${getTranslation('table.status')}</span><strong>${status}</strong></div>
             <div><span>${getTranslation('table.date_uploaded')}</span><strong>${formatDate(primaryDoc.uploadDate)}</strong></div>
             ${primaryDoc.comment ? `<div class="status-detail-wide"><span>${getTranslation('dashboard.admin_comment')}</span><strong>${primaryDoc.comment}</strong></div>` : ''}
@@ -645,7 +748,11 @@ function renderRegistrationStatusState(baby) {
         </div>
       </div>
     </section>
+    ${renderDocumentsOverlay(baby)}
   `;
+  document.getElementById('documentsPanelClose')?.addEventListener('click', closeDocumentsOverlay);
+  applyDocumentsOverlayState(documentsOverlayOpen);
+  bindDocumentButtons(baby);
   renderHeaderNotifications();
 }
 
@@ -667,6 +774,11 @@ function renderBabyList(babies) {
     const next = getNextSchedule(baby);
     const active = String(baby.id) === String(selectedBabyId) ? 'selected' : '';
     const hasNotification = babyNeedsAttention(baby);
+    const registrationStatus = getRegistrationStatus(baby);
+    const isApproved = isApprovedStatus(registrationStatus);
+    const nextLabel = isApproved
+      ? `${getTranslation('dashboard.next_vaccine')}: ${next.vaccine}`
+      : `${getTranslation('dashboard.registration_status')}: ${registrationStatus}`;
 
     return `
       <div class="baby-selector-card ${active}" data-baby-id="${baby.id}" role="button" tabindex="0" aria-pressed="${active ? 'true' : 'false'}">
@@ -674,7 +786,7 @@ function renderBabyList(babies) {
         <div class="baby-selector-card-main">
           <div class="baby-selector-copy">
             <span class="baby-selector-name">${baby.name}</span>
-            <span class="baby-selector-next">${getTranslation('dashboard.next_vaccine')}: ${next.vaccine}</span>
+            <span class="baby-selector-next">${nextLabel}</span>
           </div>
         </div>
       </div>
@@ -1429,42 +1541,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Try real backend first
     try {
       const data = await apiFetch('/babies');
-      if (data && !data._fallback && Array.isArray(data)) {
-        // Normalize API data to match frontend expected format
-        cachedBabies = data.map(baby => ({
-          ...baby,
-          name: baby.name || `${baby.first_name} ${baby.middle_name || ''} ${baby.last_name}`.trim(),
-          registrationNumber: baby.registrationNumber || baby.registration_number,
-          registrationStatus: baby.registrationStatus || baby.registration_status,
-          guardianName: baby.guardianName || baby.guardian_name,
-          guardianPhone: baby.guardianPhone || baby.guardian_phone,
-          guardianAddress: baby.guardianAddress || baby.guardian_address,
-          motherName: baby.motherName || baby.mother_name,
-          fatherName: baby.fatherName || baby.father_name,
-          placeOfBirth: baby.placeOfBirth || baby.place_of_birth,
-          birthWeight: baby.birthWeight || baby.birth_weight,
-          bloodType: baby.bloodType || baby.blood_type,
-          privateClinic: baby.privateClinic ?? Boolean(baby.private_clinic),
-          privateClinicName: baby.privateClinicName || baby.private_clinic_name,
-          upcoming: (baby.upcoming || []).map(u => ({
-            ...u,
-            targetDate: u.targetDate || u.target_date,
-          })),
-          documents: (baby.documents || []).map(d => ({
-            ...d,
-            uploadDate: d.uploadDate || d.upload_date,
-          })),
-        }));
+      if (data && Array.isArray(data)) {
+        // Normalize API data to match frontend expected format, then keep every
+        // baby that belongs to the current parent regardless of approval status.
+        cachedBabies = data
+          .map(normalizeBabyRecord)
+          .filter(babyBelongsToCurrentParent);
       } else {
-        throw new Error('Fallback to local');
+        throw new Error('Unexpected database response');
       }
     } catch (err) {
-      console.warn('[API] Falling back to local babies:', err.message);
-      cachedBabies = getBabiesForCurrentParent();
+      console.warn('[API] Unable to load parent baby records from database:', err.message);
+      cachedBabies = [];
     }
 
+    const requestedBabyId = getRequestedSelectedBabyId();
+    const requestedBaby = cachedBabies.find(baby => String(baby.id) === String(requestedBabyId));
     const approvedBaby = cachedBabies.find(baby => isApprovedStatus(getRegistrationStatus(baby)));
-    selectedBabyId = approvedBaby?.id || cachedBabies[0]?.id || null;
+    selectedBabyId = requestedBaby?.id || selectedBabyId || approvedBaby?.id || cachedBabies[0]?.id || null;
     renderBabyList(cachedBabies);
 
     if (!cachedBabies.length) {
@@ -1474,7 +1568,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   } catch (err) {
     console.error('Dashboard error:', err);
-    cachedBabies = getBabiesForCurrentParent();
+    cachedBabies = [];
+    selectedBabyId = null;
+    renderBabyList(cachedBabies);
     renderNoBabyState();
   } finally {
     hideLoading();

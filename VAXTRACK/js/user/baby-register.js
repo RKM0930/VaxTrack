@@ -1,5 +1,5 @@
 import { requireAuth } from '../auth.js';
-import { apiFetch, registerBabyRecord, isDuplicateBabyRecord } from '../api.js';
+import { registerBabyRecord, isDuplicateBabyRecord } from '../api.js';
 import { setupI18n, getTranslation } from '../i18n.js';
 import { showLoading, hideLoading, showToast, createDocumentPreviewHtml } from '../utils.js';
 
@@ -84,6 +84,10 @@ function getPayload(formData, documentFile) {
   const guardianHouseStreet = (formData.get('guardianHouseStreet') || '').trim();
   const guardianAddress = guardianHouseStreet;
 
+  const parentEmail = localStorage.getItem('vax_email') || '';
+  const parentId = localStorage.getItem('vax_id') || '';
+  const submittedAt = new Date().toISOString();
+
   return {
     firstName,
     middleName,
@@ -105,7 +109,15 @@ function getPayload(formData, documentFile) {
     documentName: documentFile?.name || '',
     documentMimeType: documentFile?.type || '',
     documentSize: documentFile?.size || 0,
-    documentDataUrl: selectedDocumentDataUrl
+    documentDataUrl: selectedDocumentDataUrl,
+    documentStatus: 'Pending',
+    registrationStatus: 'Pending',
+    status: 'Pending',
+    parentEmail,
+    parentId,
+    userId: parentId,
+    createdAt: submittedAt,
+    uploadDate: submittedAt.split('T')[0]
   };
 }
 
@@ -155,8 +167,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       showLoading(getTranslation('baby_register.loading'));
-      await apiFetch('/babies', { method: 'POST', body: JSON.stringify(payload) });
-      registerBabyRecord(payload);
+      const savedBaby = await registerBabyRecord(payload);
+      if (savedBaby?.id) sessionStorage.setItem('vax_selected_baby_id', String(savedBaby.id));
       showToast(getTranslation('baby_register.success'));
       form.reset();
       resetUploadUi();

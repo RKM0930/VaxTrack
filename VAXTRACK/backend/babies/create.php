@@ -8,6 +8,7 @@ $body = getRequestBody();
 // Validate required fields
 $firstName = trim($body['firstName'] ?? '');
 $lastName  = trim($body['lastName'] ?? '');
+$middleName = trim($body['middleName'] ?? '');
 $dob       = trim($body['dob'] ?? '');
 $sex       = trim($body['sex'] ?? '');
 
@@ -37,7 +38,7 @@ $stmt->execute([
   $user['id'],
   $regNumber,
   $firstName,
-  trim($body['middleName'] ?? ''),
+  $middleName,
   $lastName,
   $dob,
   $sex,
@@ -54,6 +55,8 @@ $stmt->execute([
 ]);
 
 $childId = $pdo->lastInsertId();
+$documentId = null;
+$documentUploadDate = date('Y-m-d');
 
 // Handle document upload
 if (!empty($body['documentDataUrl'])) {
@@ -75,6 +78,7 @@ if (!empty($body['documentDataUrl'])) {
     VALUES (?, 'Birth Certificate', ?, ?, ?, 'Pending')
   ");
   $stmt->execute([$childId, $filename, 'uploads/' . $filename, $mimeType]);
+  $documentId = $pdo->lastInsertId();
 }
 
 // Auto-generate DOH vaccine schedules
@@ -109,6 +113,12 @@ $stmt->execute([$childId]);
 
 respond([
   'id'                 => $childId,
+  'userId'             => $user['id'],
   'registrationNumber' => $regNumber,
+  'registrationStatus' => 'Pending',
+  'status'             => 'Pending',
+  'documentId'         => $documentId,
+  'documentStatus'     => 'Pending',
+  'uploadDate'         => $documentUploadDate,
   'message'            => 'Baby registered successfully'
 ], 201);

@@ -1,5 +1,5 @@
 import { requireAdminAuth, setupNav } from '../auth.js';
-import { apiFetch, getAllBabies, getDashboardStats } from '../api.js';
+import { apiFetch, getDashboardStats } from '../api.js';
 import { showLoading, hideLoading, formatDate, statusClass, sortByDateAsc } from '../utils.js';
 import { setupI18n, getTranslation } from '../i18n.js';
 
@@ -16,7 +16,7 @@ const alertState = {
 function normalizeBaby(baby = {}) {
   return {
     ...baby,
-    name: baby.name || `${baby.first_name || ''} ${baby.middle_name || ''} ${baby.last_name || ''}`.trim(),
+    name: baby.name || [baby.first_name, baby.middle_name, baby.last_name].filter(Boolean).join(' ').trim(),
     registrationNumber: baby.registrationNumber || baby.registration_number,
     guardianName: baby.guardianName || baby.guardian_name,
     guardianPhone: baby.guardianPhone || baby.guardian_phone,
@@ -288,11 +288,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         apiFetch('/dashboard/stats'),
         apiFetch('/babies')
       ]);
-      if (stats?._fallback || babies?._fallback || !Array.isArray(babies)) throw new Error('Fallback');
+      if (!Array.isArray(babies)) throw new Error('Unexpected database response');
     } catch (err) {
-      console.warn('[API] Falling back to mock dashboard data:', err.message);
-      stats = getDashboardStats();
-      babies = getAllBabies();
+      console.warn('[API] Unable to load dashboard data from database:', err.message);
+      babies = [];
+      stats = getDashboardStats(babies);
     }
 
     renderStats(stats);

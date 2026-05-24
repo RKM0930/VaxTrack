@@ -1,5 +1,5 @@
 import { requireAdminAuth, setupNav } from '../auth.js';
-import { getAllBabies, updateDocumentStatus } from '../api.js';
+import { apiFetch, updateDocumentStatus } from '../api.js';
 import {
   showLoading,
   hideLoading,
@@ -16,6 +16,8 @@ requireAdminAuth();
 const filterState = {
   status: 'All Documents'
 };
+
+let allBabies = [];
 
 const statusOrder = {
   Pending: 0,
@@ -44,9 +46,25 @@ function getDisplayStatus(doc = {}) {
   return doc.status || 'Pending';
 }
 
+function normalizeBabyRecord(baby = {}) {
+  return {
+    ...baby,
+    name: baby.name || [baby.first_name, baby.middle_name, baby.last_name].filter(Boolean).join(' ').trim(),
+    registrationNumber: baby.registrationNumber || baby.registration_number,
+    guardianName: baby.guardianName || baby.guardian_name,
+    guardianPhone: baby.guardianPhone || baby.guardian_phone,
+    documents: baby.documents || []
+  };
+}
+
+async function loadDocumentsFromDatabase() {
+  const data = await apiFetch('/babies');
+  allBabies = Array.isArray(data) ? data.map(normalizeBabyRecord) : [];
+}
+
 function getDocuments() {
   const docs = [];
-  getAllBabies().forEach(baby => {
+  allBabies.forEach(baby => {
     (baby.documents || []).forEach(doc => {
       docs.push({ ...doc, baby, displayStatus: getDisplayStatus(doc) });
     });
@@ -228,6 +246,7 @@ async function handleAction(id, newStatus, comment = '', onSuccess = null) {
       newStatus === 'Approved' ? 'success' : 'warning'
     );
     if (typeof onSuccess === 'function') onSuccess();
+    await loadDocumentsFromDatabase();
     renderDocs();
   } catch (err) {
     showToast(err.message || 'Unable to update document.', 'error');
@@ -245,10 +264,17 @@ function setupDocumentFilters() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   setupNav();
   setupI18n();
   setupDocumentFilters();
   showLoading();
-  setTimeout(() => { renderDocs(); hideLoading(); }, 300);
+  try {
+    await loadDocumentsFromDatabase();
+  } catch (err) {
+    console.warn('[API] Unable to load documents from database:', err.message);
+    allBabies = [];
+  }
+  renderDocs();
+  hideLoading();
 });

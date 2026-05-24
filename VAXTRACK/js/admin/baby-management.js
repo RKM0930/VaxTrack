@@ -1,5 +1,5 @@
 import { requireAdminAuth, setupNav } from '../auth.js';
-import { apiFetch, getAllBabies } from '../api.js';
+import { apiFetch } from '../api.js';
 import { showLoading, hideLoading, formatBabyAge, formatValue, formatDate, statusClass, sortByDateAsc, sortByDateDesc, openDocumentModal } from '../utils.js';
 import { setupI18n, getTranslation } from '../i18n.js';
 
@@ -7,7 +7,7 @@ requireAdminAuth();
 
 const normalize = (baby) => ({
   ...baby,
-  name: baby.name || `${baby.first_name || ''} ${baby.middle_name || ''} ${baby.last_name || ''}`.trim(),
+  name: baby.name || [baby.first_name, baby.middle_name, baby.last_name].filter(Boolean).join(' ').trim(),
   registrationNumber: baby.registrationNumber || baby.registration_number,
   registrationStatus: baby.registrationStatus || baby.registration_status,
   guardianName: baby.guardianName || baby.guardian_name,
@@ -386,11 +386,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (data && Array.isArray(data)) {
       allBabies = data.map(normalize);
     } else {
-      throw new Error('Fallback');
+      throw new Error('Unexpected database response');
     }
   } catch (err) {
-    console.warn('[API] Falling back to mock babies:', err.message);
-    allBabies = getAllBabies().map(normalize);
+    console.warn('[API] Unable to load baby records from database:', err.message);
+    allBabies = [];
   }
 
   renderDirectory();

@@ -37,7 +37,7 @@ foreach ($children as &$child) {
   $child['testHistory'] = $stmt->fetchAll();
 
   // Format for frontend
-  $child['name'] = trim($child['first_name'] . ' ' . $child['middle_name'] . ' ' . $child['last_name']);
+  $child['name'] = implode(' ', array_filter([$child['first_name'] ?? '', $child['middle_name'] ?? '', $child['last_name'] ?? '']));
   $child['registrationNumber'] = $child['registration_number'];
   $child['registrationStatus'] = $child['registration_status'];
   $child['guardianAddress'] = $child['guardian_address'];

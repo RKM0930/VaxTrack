@@ -128,7 +128,7 @@ const taglishText = {
   "baby_register.document_hint": "PDF, JPG, or PNG only. Max file size: 5MB. Pending muna ito for BHW verification.",
   "baby_register.name": "Baby Full Name",
   "baby_register.first_name": "First Name",
-  "baby_register.middle_name": "Middle Name",
+  "baby_register.middle_name": "Middle Name (optional)",
   "baby_register.last_name": "Last Name",
   "baby_register.birth_details": "Birth Details",
   "baby_register.address_info": "Address Information",

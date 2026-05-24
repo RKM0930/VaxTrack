@@ -1,9 +1,11 @@
 import { requireAdminAuth, setupNav } from '../auth.js';
-import { getAllBabies, addVaccinationRecord } from '../api.js';
+import { apiFetch, addVaccinationRecord } from '../api.js';
 import { showLoading, hideLoading, showToast, formatDate, statusClass, sortByDateAsc, sortByDateDesc } from '../utils.js';
 import { setupI18n, getTranslation } from '../i18n.js';
 
 requireAdminAuth();
+
+let allBabies = [];
 
 const logFilters = {
   search: '',
@@ -13,6 +15,26 @@ const logFilters = {
   reaction: 'all',
   source: 'all'
 };
+
+
+function normalizeBabyRecord(baby = {}) {
+  return {
+    ...baby,
+    name: baby.name || [baby.first_name, baby.middle_name, baby.last_name].filter(Boolean).join(' ').trim(),
+    registrationNumber: baby.registrationNumber || baby.registration_number,
+    registrationStatus: baby.registrationStatus || baby.registration_status,
+    vaccinations: baby.vaccinations || [],
+    upcoming: (baby.upcoming || []).map(item => ({
+      ...item,
+      targetDate: item.targetDate || item.target_date,
+    }))
+  };
+}
+
+async function loadBabiesFromDatabase() {
+  const data = await apiFetch('/babies');
+  allBabies = Array.isArray(data) ? data.map(normalizeBabyRecord) : [];
+}
 
 function escapeHtml(value = '') {
   return String(value ?? '')
@@ -41,7 +63,7 @@ function formatDateTime(value = '') {
 }
 
 function getRecentLogs() {
-  return sortByDateDesc(getAllBabies().flatMap(baby => (baby.vaccinations || []).map((record, index) => {
+  return sortByDateDesc(allBabies.flatMap(baby => (baby.vaccinations || []).map((record, index) => {
     const source = record.privateClinic ? (record.clinicName || record.source || 'Private Clinic') : (record.source || 'Barangay Health Center');
     return {
       ...record,
@@ -61,7 +83,7 @@ function getRecentLogs() {
 
 function getVaccineOptions() {
   const names = new Set();
-  getAllBabies().forEach(baby => {
+  allBabies.forEach(baby => {
     (baby.vaccinations || []).forEach(item => item.vaccine && names.add(item.vaccine));
     (baby.upcoming || []).forEach(item => item.vaccine && names.add(item.vaccine));
   });
@@ -240,7 +262,7 @@ function openVaccineLogModal(prefilledBabyId = '') {
   const existing = document.getElementById('vaccineLogModal');
   if (existing) existing.remove();
 
-  const babies = getAllBabies();
+  const babies = allBabies;
   const baby = babies.find(item => String(item.id) === String(prefilledBabyId));
 
   const modal = document.createElement('div');
@@ -319,7 +341,7 @@ function openVaccineLogModal(prefilledBabyId = '') {
 }
 
 function renderSelectedBabyScheduleHtml(babyId) {
-  const baby = getAllBabies().find(item => String(item.id) === String(babyId));
+  const baby = allBabies.find(item => String(item.id) === String(babyId));
   if (!baby) {
     return `<div class="empty-state compact-empty">${getTranslation('admin.choose_baby')}</div>`;
   }
@@ -347,7 +369,7 @@ function renderSelectedBabyScheduleHtml(babyId) {
 function updateModalForBaby(babyId) {
   const modal = document.getElementById('vaccineLogModal');
   if (!modal) return;
-  const baby = getAllBabies().find(item => String(item.id) === String(babyId));
+  const baby = allBabies.find(item => String(item.id) === String(babyId));
   const scheduleSelect = modal.querySelector('#scheduledVaccineSelect');
   const schedulePanel = modal.querySelector('#selectedBabySchedule');
   if (scheduleSelect) scheduleSelect.innerHTML = buildScheduleOptions(baby || {});
@@ -359,7 +381,7 @@ function populateScheduleFields() {
   const modal = document.getElementById('vaccineLogModal');
   if (!modal) return;
   const babyId = modal.querySelector('#babySelect')?.value;
-  const baby = getAllBabies().find(item => String(item.id) === String(babyId));
+  const baby = allBabies.find(item => String(item.id) === String(babyId));
   const scheduleKey = modal.querySelector('#scheduledVaccineSelect')?.value;
   const vaccineField = modal.querySelector('#vaccineNameField');
   const doseField = modal.querySelector('#vaccineDoseField');
@@ -409,6 +431,7 @@ async function handleSubmit(event) {
   try {
     showLoading(getTranslation('admin.update_record'));
     await addVaccinationRecord(babyId, record);
+    await loadBabiesFromDatabase();
     showToast(getTranslation('admin.vaccine_saved'));
     form.closest('#vaccineLogModal')?.remove();
     renderVaccineEntry(false);
@@ -419,9 +442,16 @@ async function handleSubmit(event) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   setupNav();
   setupI18n();
   showLoading();
-  setTimeout(() => { renderVaccineEntry(); hideLoading(); }, 300);
+  try {
+    await loadBabiesFromDatabase();
+  } catch (err) {
+    console.warn('[API] Unable to load vaccination records from database:', err.message);
+    allBabies = [];
+  }
+  renderVaccineEntry();
+  hideLoading();
 });
