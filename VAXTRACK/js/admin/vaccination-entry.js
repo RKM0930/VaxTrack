@@ -5,9 +5,36 @@ import { setupI18n, getTranslation } from '../i18n.js';
 
 requireAdminAuth();
 
+const normalize = (baby) => ({
+  ...baby,
+  name: baby.name || `${baby.first_name} ${baby.middle_name || ''} ${baby.last_name}`.trim(),
+  registrationNumber: baby.registrationNumber || baby.registration_number,
+  registrationStatus: baby.registrationStatus || baby.registration_status,
+  guardianName: baby.guardianName || baby.guardian_name,
+  guardianPhone: baby.guardianPhone || baby.guardian_phone,
+  guardianAddress: baby.guardianAddress || baby.guardian_address,
+  motherName: baby.motherName || baby.mother_name,
+  fatherName: baby.fatherName || baby.father_name,
+  placeOfBirth: baby.placeOfBirth || baby.place_of_birth,
+  birthWeight: baby.birthWeight || baby.birth_weight,
+  bloodType: baby.bloodType || baby.blood_type,
+  privateClinic: baby.privateClinic ?? Boolean(baby.private_clinic),
+  privateClinicName: baby.privateClinicName || baby.private_clinic_name,
+  upcoming: (baby.upcoming || []).map(u => ({
+    ...u,
+    targetDate: u.targetDate || u.target_date,
+  })),
+  documents: (baby.documents || []).map(d => ({
+    ...d,
+    uploadDate: d.uploadDate || d.upload_date,
+  })),
+});
+
+let allBabies = [];
+
 function renderVaccineEntry() {
   const area = document.getElementById('vaccineEntryArea');
-  const babies = getAllBabies();
+  const babies = allBabies;
   const params = new URLSearchParams(window.location.search);
   const selectedBaby = params.get('baby') || '';
 
@@ -59,7 +86,7 @@ function renderVaccineEntry() {
 
 function renderSelectedBabySchedule(babyId) {
   const container = document.getElementById('selectedBabySchedule');
-  const baby = getAllBabies().find(item => String(item.id) === String(babyId));
+  const baby = allBabies.find(item => String(item.id) === String(babyId));
   if (!baby) {
     container.innerHTML = `<h3 class="card-title">${getTranslation('dashboard.schedule_details')}</h3><div class="empty-state compact-empty">${getTranslation('admin.choose_baby')}</div>`;
     return;
@@ -109,9 +136,23 @@ async function handleSubmit(event) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   setupNav();
   setupI18n();
   showLoading();
-  setTimeout(() => { renderVaccineEntry(); hideLoading(); }, 300);
+
+  try {
+    const data = await apiFetch('/babies');
+    if (data && Array.isArray(data)) {
+      allBabies = data.map(normalize);
+    } else {
+      throw new Error('Fallback');
+    }
+  } catch (err) {
+    console.warn('[API] Falling back to mock babies:', err.message);
+    allBabies = getAllBabies();
+  }
+
+  renderVaccineEntry();
+  hideLoading();
 });
