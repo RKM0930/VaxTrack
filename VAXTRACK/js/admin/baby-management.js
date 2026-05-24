@@ -35,7 +35,7 @@ let allBabies = [];
 function getNextSchedule(baby) {
   return sortByDateAsc((baby.upcoming || []).filter(item => item.status !== 'Completed'), 'targetDate')[0] || { vaccine: getTranslation('dashboard.up_to_date'), targetDate: '-', status: 'Completed' };
 }
-s
+
 function renderDirectory(query = '') {
   const list = document.getElementById('directoryList');
   const normalized = query.trim().toLowerCase();
