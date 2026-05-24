@@ -28,18 +28,20 @@
       <a href="document-verification.html" class="active" data-i18n="nav.verify_docs"><i class="fas fa-file-contract" style="width:25px"></i> Verify Docs</a>
       <a href="schedule-management.html" data-i18n="nav.schedules"><i class="fas fa-calendar-alt" style="width:25px"></i> Schedules</a>
     </aside>
-    <main class="main-content" style="max-width:100%">
-      <section class="page-hero compact">
-        <div>
-          <p class="page-kicker">Document Verification</p>
-          <h1 data-i18n="admin.pending_docs">Pending Document Verification</h1>
-          <p data-i18n="admin.pending_docs_subtitle">I-approve o i-flag ang uploaded birth certificates bago ma-finalize ang registration.</p>
+    <main class="main-content admin-docs-page" style="max-width:100%">
+      <div class="card admin-action-table-card admin-doc-verification-card">
+        <div class="admin-doc-toolbar">
+          <div class="admin-doc-filter-row" aria-label="Filter documents by status">
+            <button type="button" class="admin-filter-pill active" data-doc-filter="All Documents" aria-pressed="true">All Documents</button>
+            <button type="button" class="admin-filter-pill" data-doc-filter="Pending" aria-pressed="false">Pending</button>
+            <button type="button" class="admin-filter-pill" data-doc-filter="Approved" aria-pressed="false">Approved</button>
+            <button type="button" class="admin-filter-pill" data-doc-filter="Rejected" aria-pressed="false">Rejected</button>
+            <button type="button" class="admin-filter-pill" data-doc-filter="Re-upload Requested" aria-pressed="false">Re-upload Requested</button>
+          </div>
         </div>
-      </section>
-      <div class="card">
-        <div class="table-responsive">
-          <table>
-            <thead><tr><th data-i18n="table.document">Document</th><th data-i18n="table.baby_name">Baby Name</th><th data-i18n="table.date_uploaded">Date Uploaded</th><th data-i18n="table.status">Status</th><th data-i18n="table.actions">Actions</th></tr></thead>
+        <div class="table-responsive admin-table-shell">
+          <table class="admin-data-table admin-doc-review-table">
+            <thead><tr><th>Document</th><th>Baby Name</th><th>Date Uploaded</th><th>Status</th><th>Action</th></tr></thead>
             <tbody id="docList"></tbody>
           </table>
         </div>

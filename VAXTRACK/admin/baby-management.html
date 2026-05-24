@@ -28,19 +28,42 @@
       <a href="document-verification.html" data-i18n="nav.verify_docs"><i class="fas fa-file-contract" style="width:25px"></i> Verify Docs</a>
       <a href="schedule-management.html" data-i18n="nav.schedules"><i class="fas fa-calendar-alt" style="width:25px"></i> Schedules</a>
     </aside>
-    <main class="main-content" style="max-width:100%">
-      <section class="page-hero compact">
-        <div>
-          <p class="page-kicker">Clinic Search</p>
-          <h1 data-i18n="admin.baby_directory">Baby Directory</h1>
-          <p data-i18n="admin.directory_subtitle">Search at i-review ang baby records ng barangay.</p>
+    <main class="main-content admin-directory-page" style="max-width:100%">
+      <div class="card admin-masterlist-card">
+        <div class="toolbar admin-filter-toolbar">
+          <div class="input-group"><i class="fas fa-search"></i><input type="text" id="adminBabySearch" class="form-control" data-i18n="admin.directory_search" placeholder="Search baby name, parent, or Reg No..."></div>
+          <select id="ageGroupFilter" class="form-control admin-filter-select" aria-label="Filter by age group">
+            <option value="all">All Age Groups</option>
+            <option value="0-6">0–6 Months</option>
+            <option value="7-12">7–12 Months</option>
+            <option value="13-24">13–24 Months</option>
+            <option value="25+">2 Years and Above</option>
+          </select>
+          <select id="statusFilter" class="form-control admin-filter-select" aria-label="Filter by status">
+            <option value="all">All Statuses</option>
+            <option value="fully-vaccinated">Fully Vaccinated</option>
+            <option value="up-to-date">Up-to-date</option>
+            <option value="due-soon">Due Soon</option>
+            <option value="overdue">Overdue</option>
+            <option value="pending-docs">Pending Docs</option>
+            <option value="rejected-docs">Rejected Docs</option>
+          </select>
         </div>
-      </section>
-      <div class="card">
-        <div class="toolbar">
-          <div class="input-group"><i class="fas fa-search"></i><input type="text" id="adminBabySearch" class="form-control" data-i18n="admin.directory_search" placeholder="Search baby name or Reg No..."></div>
+        <div class="table-responsive admin-table-shell">
+          <table class="admin-data-table admin-masterlist-table">
+            <thead>
+              <tr>
+                <th>Patient ID</th>
+                <th>Baby's Full Name</th>
+                <th>DOB (Age)</th>
+                <th>Parent/Guardian</th>
+                <th>Contact Number</th>
+                <th>Status Summary</th>
+              </tr>
+            </thead>
+            <tbody id="directoryList"></tbody>
+          </table>
         </div>
-        <div id="directoryList" class="directory-list"></div>
       </div>
     </main>
   </div>

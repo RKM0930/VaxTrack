@@ -382,15 +382,22 @@ export async function addVaccinationRecord(babyId, record) {
     privateClinic: Boolean(record.privateClinic)
   };
 
+  const cleanDate = value => String(value || '').split('T')[0];
+  const cleanText = value => String(value || '').trim().toLowerCase();
+
   const applyUpdate = baby => {
     if (String(baby.id) !== String(babyId)) return false;
     baby.vaccinations = baby.vaccinations || [];
     baby.vaccinations.push(normalizedRecord);
-    baby.upcoming = (baby.upcoming || []).map(item => (
-      item.vaccine.toLowerCase() === normalizedRecord.vaccine.toLowerCase()
-        ? { ...item, status: 'Completed', targetDate: normalizedRecord.date }
-        : item
-    ));
+    const targetDate = cleanDate(normalizedRecord.targetDate);
+    baby.upcoming = (baby.upcoming || []).map(item => {
+      const sameVaccine = cleanText(item.vaccine) === cleanText(normalizedRecord.vaccine);
+      const sameTargetDate = targetDate && cleanDate(item.targetDate) === targetDate;
+      if (sameVaccine && (!targetDate || sameTargetDate)) {
+        return { ...item, status: 'Completed', completedDate: cleanDate(normalizedRecord.date), targetDate: item.targetDate || targetDate };
+      }
+      return item;
+    });
     return true;
   };
 

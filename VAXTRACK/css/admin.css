@@ -631,3 +631,2200 @@
     flex-direction: column;
   }
 }
+
+/* --- BHW/Admin task-focused refactor based on uploaded workspace references --- */
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+
+.admin-layout {
+  grid-template-columns: 250px minmax(0, 1fr);
+  background: linear-gradient(180deg, #f8fafc 0%, #eef7fc 100%);
+}
+
+.admin-layout .main-content {
+  width: 100%;
+  max-width: 1440px !important;
+  padding: 28px clamp(18px, 2.5vw, 36px) 40px;
+  margin: 0 auto;
+}
+
+.sidebar {
+  padding: 26px 12px 18px;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 8px 0 24px rgba(15, 23, 42, 0.035);
+}
+
+.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 5px 0;
+  padding: 13px 14px;
+  border-left: 0;
+  border-radius: 12px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+  background: #e0f2fe;
+  color: var(--color-primary-dark);
+  border-left-color: transparent;
+}
+
+.admin-page-heading {
+  padding: 24px 26px !important;
+  margin-bottom: 22px !important;
+  border-radius: 20px !important;
+  background: #fff !important;
+  border-color: #dbe7ef !important;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.055) !important;
+}
+
+.admin-page-heading h1 {
+  font-size: clamp(1.55rem, 2.4vw, 2rem) !important;
+  margin-bottom: 6px !important;
+  letter-spacing: -0.04em;
+}
+
+.admin-heading-sub,
+.admin-card-subtitle {
+  color: var(--color-muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.admin-layout .card {
+  border-radius: 18px;
+  border-color: #dbe7ef;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.055);
+}
+
+.admin-kpi-grid,
+.admin-overview-page .metric-cards {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.admin-kpi-grid .metric-card,
+.admin-overview-page .metric-card {
+  min-height: 128px;
+  align-items: flex-start;
+  text-align: left;
+  padding: 20px 22px;
+  border-top: 4px solid #bae6fd;
+}
+
+.admin-kpi-grid .metric-card.metric-danger {
+  background: #fff1f2;
+  border-color: #fecdd3;
+  border-top-color: #fda4af;
+}
+
+.admin-kpi-grid .metric-card .metric-label,
+.admin-overview-page .metric-card .metric-label {
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.admin-kpi-grid .metric-card .number,
+.admin-overview-page .metric-card .number {
+  margin: 10px 0 6px;
+  font-size: clamp(2rem, 3vw, 2.45rem);
+  color: #075985;
+  letter-spacing: -0.06em;
+}
+
+.admin-kpi-grid .metric-card small {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.admin-kpi-grid .metric-danger .number,
+.admin-kpi-grid .metric-danger small {
+  color: #be123c;
+}
+
+.admin-action-table-card {
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.admin-action-table-card .overview-card-heading {
+  padding: 22px 26px 18px;
+  margin: 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.admin-table-shell {
+  border-radius: 0;
+}
+
+.admin-data-table {
+  width: 100%;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.admin-data-table th {
+  background: #f1f7fb !important;
+  color: #64748b !important;
+  font-size: 0.76rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.075em !important;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.admin-data-table th,
+.admin-data-table td {
+  padding: 16px 20px !important;
+  vertical-align: middle;
+}
+
+.admin-data-table tbody tr:hover {
+  background: #f8fbfd;
+}
+
+.admin-data-table strong {
+  color: var(--color-dark);
+}
+
+.admin-muted {
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.admin-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  color: #475569;
+  font-size: 0.86rem;
+}
+
+.admin-type-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.admin-type-pill.medical { background: #dbeafe; color: #1d4ed8; }
+.admin-type-pill.document { background: #ede9fe; color: #6d28d9; }
+
+.badge.due-soon { background: #dbeafe; color: #1d4ed8; }
+.badge.action-required,
+.badge.pending-review,
+.badge.missed-follow-up { background: #fef3c7; color: #b45309; }
+.badge.rejected,
+.badge.rejected-docs { background: #fee2e2; color: #b91c1c; }
+
+.btn-sm,
+.admin-layout .inline-actions .btn {
+  min-height: 34px;
+  padding: 7px 12px !important;
+  border-radius: 999px;
+  font-size: 0.78rem !important;
+}
+
+.admin-export-btn {
+  color: #0f766e;
+  border-color: #dbe7ef;
+  background: #fff;
+}
+
+.admin-export-btn:hover {
+  color: #fff;
+}
+
+.admin-filter-toolbar {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) 190px 190px;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.admin-filter-select {
+  min-width: 0;
+  background: #f8fafc;
+  font-weight: 600;
+  color: #334155;
+}
+
+.admin-masterlist-card {
+  padding: 24px !important;
+}
+
+.admin-masterlist-table {
+  border: 1px solid #dbe7ef !important;
+  border-radius: 14px !important;
+  overflow: hidden;
+}
+
+.directory-details-row td {
+  background: #fbfdff;
+  padding: 0 !important;
+}
+
+.directory-details-panel {
+  padding: 20px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.admin-detail-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(280px, 1.1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.admin-profile-grid.info-grid,
+.admin-profile-grid {
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.admin-address-item {
+  grid-column: span 2;
+}
+
+.mini-record-list {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #f8fbfd;
+}
+
+.mini-record-list span {
+  display: block;
+  padding-top: 7px;
+  border-top: 1px solid #e2e8f0;
+  color: #475569;
+  font-size: 0.86rem;
+}
+
+.document-chip-list {
+  display: grid;
+  gap: 10px;
+}
+
+.document-chip {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.document-chip-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.admin-log-form-grid,
+.vaccine-entry-grid.admin-log-form-grid {
+  display: grid;
+  grid-template-columns: minmax(360px, 0.85fr) minmax(320px, 0.65fr);
+  gap: 20px;
+  align-items: start;
+  margin-bottom: 22px;
+}
+
+.vaccine-log-table-card {
+  margin-top: 0;
+}
+
+.reaction-flag {
+  color: #f59e0b;
+  font-size: 1rem;
+}
+
+.admin-document-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-file-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #e0f2fe;
+  color: var(--color-primary);
+  flex: 0 0 42px;
+}
+
+.admin-doc-actions {
+  gap: 8px;
+}
+
+.admin-schedule-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.75fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.admin-schedule-card,
+.admin-doh-guide-card {
+  padding: 22px !important;
+}
+
+.admin-event-list {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-event-item,
+.schedule-item.admin-event-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 16px 18px;
+  background: #f8fbfd;
+  border: 1px solid #dbe7ef;
+  border-radius: 16px;
+}
+
+.admin-event-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.admin-date-tile {
+  width: 72px;
+  min-width: 72px;
+  border: 1px solid #bae6fd;
+  border-radius: 14px;
+  background: #fff;
+  color: #075985;
+  text-align: center;
+  padding: 10px 8px;
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-date-tile span {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.admin-date-tile strong {
+  display: block;
+  color: #0369a1;
+  font-size: 1.7rem;
+  line-height: 1.1;
+}
+
+.admin-event-main h3 {
+  color: var(--color-dark);
+  margin-bottom: 5px;
+  font-size: 1rem;
+}
+
+.admin-event-main p {
+  color: #64748b;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0 0 3px;
+}
+
+.admin-event-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-separator-dot {
+  padding: 0 6px;
+  color: #cbd5e1;
+}
+
+.compact-table th,
+.compact-table td {
+  padding: 12px 14px !important;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 1240px) {
+  .admin-kpi-grid,
+  .admin-overview-page .metric-cards {
+    grid-template-columns: repeat(3, minmax(170px, 1fr));
+  }
+
+  .admin-schedule-layout,
+  .admin-log-form-grid,
+  .vaccine-entry-grid.admin-log-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .admin-layout { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+
+  .admin-layout .main-content {
+    padding: 22px 18px 34px;
+  }
+
+  .admin-filter-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-detail-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-kpi-grid,
+  .admin-overview-page .metric-cards,
+  .admin-profile-grid.info-grid,
+  .admin-profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-page-heading {
+    flex-direction: column;
+    align-items: stretch !important;
+    padding: 20px !important;
+  }
+
+  .admin-page-heading .hero-actions,
+  .admin-page-heading .hero-actions .btn {
+    width: 100%;
+  }
+
+  .document-chip,
+  .admin-event-item,
+  .schedule-item.admin-event-item {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-event-main {
+    align-items: flex-start;
+  }
+
+  .admin-event-actions,
+  .document-chip-actions,
+  .admin-doc-actions {
+    justify-content: flex-start;
+  }
+
+  .admin-address-item {
+    grid-column: auto;
+  }
+}
+
+/* --- Compact admin tab layout: remove oversized page heading cards --- */
+.admin-layout .main-content {
+  padding-top: 18px;
+}
+
+.admin-overview-page .metric-cards,
+.admin-kpi-grid {
+  margin-top: 0;
+}
+
+.admin-masterlist-card,
+.admin-action-table-card,
+.admin-schedule-card,
+.vaccine-entry-grid.admin-log-form-grid,
+.admin-log-form-grid {
+  margin-top: 0;
+}
+
+.admin-content-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+}
+
+.admin-section-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-action-table-card .overview-card-heading {
+  gap: 14px;
+}
+
+@media (max-width: 760px) {
+  .admin-layout .main-content {
+    padding-top: 14px;
+  }
+
+  .admin-content-actions,
+  .admin-section-actions {
+    justify-content: stretch;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .admin-content-actions .btn,
+  .admin-section-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* --- Compact one-line Directory masterlist rows --- */
+.admin-directory-page .admin-table-shell {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.admin-masterlist-table {
+  min-width: 1080px;
+  table-layout: auto;
+}
+
+.admin-masterlist-table th,
+.admin-masterlist-table td {
+  padding: 10px 12px !important;
+  font-size: 0.82rem !important;
+  line-height: 1.25;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.admin-masterlist-table th {
+  font-size: 0.7rem !important;
+}
+
+.admin-masterlist-table th:nth-child(1),
+.admin-masterlist-table td:nth-child(1) { width: 126px; min-width: 126px; }
+
+.admin-masterlist-table th:nth-child(2),
+.admin-masterlist-table td:nth-child(2) { width: 260px; min-width: 260px; }
+
+.admin-masterlist-table th:nth-child(3),
+.admin-masterlist-table td:nth-child(3) { width: 160px; min-width: 160px; }
+
+.admin-masterlist-table th:nth-child(4),
+.admin-masterlist-table td:nth-child(4) { width: 180px; min-width: 180px; }
+
+.admin-masterlist-table th:nth-child(5),
+.admin-masterlist-table td:nth-child(5) { width: 144px; min-width: 144px; }
+
+.admin-masterlist-table th:nth-child(6),
+.admin-masterlist-table td:nth-child(6) { width: 330px; min-width: 330px; }
+
+.admin-masterlist-table .directory-primary-text {
+  display: inline-block;
+  color: var(--color-dark);
+  font-size: 0.86rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.admin-masterlist-table .directory-secondary-text,
+.admin-masterlist-table .admin-mono {
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.admin-masterlist-table .directory-status-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.admin-masterlist-table .directory-status-detail {
+  color: #475569;
+  font-size: 0.76rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.admin-masterlist-table .badge {
+  padding: 4px 8px;
+  font-size: 0.66rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.admin-directory-name-cell {
+  cursor: pointer;
+}
+
+.admin-directory-name-content {
+  display: inline-grid;
+  grid-template-columns: var(--directory-name-slot, 18ch) 22px;
+  align-items: center;
+  column-gap: 8px;
+  width: calc(var(--directory-name-slot, 18ch) + 30px);
+  white-space: nowrap;
+}
+
+.admin-directory-name-content .directory-primary-text {
+  min-width: 0;
+  line-height: 1.1;
+}
+
+.admin-directory-name-cell:hover .directory-primary-text,
+.admin-directory-name-cell:focus-within .directory-primary-text {
+  color: var(--color-primary);
+}
+
+.admin-record-inline-trigger {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  max-width: 22px;
+  flex: 0 0 22px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid #93c5fd;
+  border-radius: 7px;
+  background: transparent;
+  color: #2563eb;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.67rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.admin-record-inline-trigger:hover,
+.admin-record-inline-trigger:focus-visible {
+  background: #eff6ff;
+  border-color: #60a5fa;
+  color: #1d4ed8;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+  transform: translate(1px, -1px);
+  outline: none;
+}
+
+@media (max-width: 900px) {
+  .admin-masterlist-card {
+    padding: 16px !important;
+  }
+
+  .admin-masterlist-table {
+    min-width: 1060px;
+  }
+
+  .admin-masterlist-table th,
+  .admin-masterlist-table td {
+    padding: 9px 10px !important;
+    font-size: 0.78rem !important;
+  }
+}
+
+/* --- Admin Directory baby record modal --- */
+.admin-baby-record-modal {
+  background: rgba(15, 23, 42, 0.56);
+  backdrop-filter: blur(2px);
+}
+
+.admin-baby-record-card {
+  width: min(1080px, 96vw);
+  max-height: 90vh;
+  padding: 0 !important;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-record-modal-header {
+  margin: 0;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid #e2e8f0;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbfd 100%);
+}
+
+.admin-record-modal-header h2 {
+  margin: 2px 0 4px;
+  color: var(--color-dark);
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  letter-spacing: -0.04em;
+}
+
+.admin-record-modal-header p:not(.page-kicker) {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.admin-record-modal-summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 14px 24px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.admin-record-modal-summary .btn {
+  margin-left: auto;
+}
+
+.admin-record-modal-body {
+  overflow-y: auto;
+  padding: 22px 24px 26px;
+  display: grid;
+  gap: 18px;
+}
+
+.admin-record-section {
+  border: 1px solid #dbe7ef;
+  border-radius: 16px;
+  background: #fff;
+  padding: 18px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.035);
+}
+
+.admin-record-section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.admin-record-section-title i {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #e0f2fe;
+  color: var(--color-primary);
+}
+
+.admin-record-section-title h3 {
+  margin: 0;
+  color: var(--color-dark);
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.admin-record-list {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-record-list-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 13px;
+  background: #f8fbfd;
+}
+
+.admin-record-list-row strong,
+.admin-record-list-row small {
+  display: block;
+}
+
+.admin-record-list-row strong {
+  color: var(--color-dark);
+  margin-bottom: 4px;
+}
+
+.admin-record-list-row small {
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.admin-record-list-meta {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+  text-align: right;
+}
+
+.admin-record-list.compact-list .admin-record-list-row,
+.admin-record-list-row.compact-row {
+  background: #fff;
+}
+
+.admin-modal-doc-list .document-chip {
+  background: #f8fbfd;
+}
+
+.admin-directory-row .admin-record-inline-trigger {
+  min-width: 22px;
+}
+
+@media (max-width: 760px) {
+  .admin-baby-record-modal {
+    align-items: flex-start;
+    padding: 12px;
+  }
+
+  .admin-baby-record-card {
+    width: 100%;
+    max-height: 96vh;
+  }
+
+  .admin-record-modal-header,
+  .admin-record-modal-summary,
+  .admin-record-modal-body {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .admin-record-modal-summary .btn {
+    width: 100%;
+    margin-left: 0;
+    justify-content: center;
+  }
+
+  .admin-record-section {
+    padding: 15px;
+  }
+
+  .admin-record-list-row {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .admin-record-list-meta {
+    justify-items: start;
+    text-align: left;
+  }
+}
+
+/* --- Separated overview action workflows with lightweight filters --- */
+.overview-action-sections {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-alert-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px 26px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fbfd;
+}
+
+.admin-filter-pill {
+  min-height: 32px;
+  padding: 6px 13px;
+  border: 1px solid #dbe7ef;
+  border-radius: 999px;
+  background: #fff;
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.015em;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.admin-filter-pill:hover {
+  border-color: #bae6fd;
+  color: #0369a1;
+  background: #f0f9ff;
+}
+
+.admin-filter-pill.active {
+  border-color: #0284c7;
+  background: #e0f2fe;
+  color: #075985;
+  box-shadow: 0 6px 14px rgba(2, 132, 199, 0.12);
+}
+
+.badge.re-upload-requested {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.text-muted {
+  color: var(--color-muted);
+}
+
+@media (max-width: 760px) {
+  .admin-alert-filter-row {
+    padding: 12px 18px;
+  }
+
+  .admin-filter-pill {
+    flex: 1 1 auto;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+/* --- Verify Docs compact review workflow --- */
+.admin-doc-verification-card {
+  overflow: hidden;
+}
+
+.admin-doc-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 14px 18px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #ffffff;
+}
+
+.admin-compact-card-title {
+  margin: 0 0 4px;
+  color: var(--color-dark);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.admin-doc-toolbar p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.admin-doc-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  width: 100%;
+  max-width: none;
+  padding: 4px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+}
+
+.admin-doc-filter-row .admin-filter-pill {
+  white-space: nowrap;
+}
+
+.admin-doc-review-table th:last-child,
+.admin-doc-review-table td:last-child {
+  width: 118px;
+  text-align: right;
+}
+
+.review-doc-btn {
+  white-space: nowrap;
+}
+
+.admin-doc-review-modal {
+  width: min(980px, 100%);
+  padding: 0;
+  overflow: hidden;
+}
+
+.admin-doc-review-modal > * {
+  margin-left: 24px;
+  margin-right: 24px;
+}
+
+.admin-doc-review-header {
+  margin: 0 0 0;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid #e2e8f0;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbfd 100%);
+}
+
+.admin-doc-review-header > * {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.admin-doc-review-status-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 16px 0 6px;
+}
+
+.admin-doc-review-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.admin-doc-review-panel {
+  padding: 16px;
+  border: 1px solid #dbe7ef;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.admin-doc-review-panel h3,
+.admin-doc-preview-heading h3 {
+  margin: 0 0 12px;
+  color: var(--color-dark);
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.admin-detail-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.admin-detail-list div {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.45fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.admin-detail-list dt {
+  color: #64748b;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.admin-detail-list dd {
+  color: #0f172a;
+  font-size: 0.86rem;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.admin-doc-remarks-panel {
+  margin-top: 14px;
+}
+
+.admin-empty-note {
+  padding: 12px 14px;
+  border: 1px dashed #dbe7ef;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.86rem;
+  margin-bottom: 14px;
+}
+
+.admin-doc-comment-input {
+  margin-top: 8px;
+  min-height: 92px;
+  resize: vertical;
+}
+
+.admin-doc-preview-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.admin-doc-preview-heading h3 {
+  margin-bottom: 0;
+}
+
+.admin-doc-review-actions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 16px 24px 20px;
+  border-top: 1px solid #e2e8f0;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+}
+
+.admin-doc-review-actions .btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.admin-doc-review-actions .btn:disabled:hover {
+  transform: none;
+}
+
+@media (max-width: 900px) {
+  .admin-doc-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-doc-filter-row {
+    justify-content: flex-start;
+    max-width: none;
+  }
+
+  .admin-doc-review-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-doc-review-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-doc-toolbar {
+    padding: 16px;
+  }
+
+  .admin-doc-filter-row .admin-filter-pill {
+    flex: 1 1 140px;
+  }
+
+  .admin-doc-review-modal > * {
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+
+  .admin-doc-review-header,
+  .admin-doc-review-actions {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .admin-detail-list div {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+
+  .admin-doc-preview-heading,
+  .admin-doc-review-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-doc-review-actions .btn {
+    width: 100%;
+  }
+}
+
+.admin-doc-review-modal {
+  overflow: auto;
+}
+
+.admin-doc-review-modal > .admin-doc-review-header,
+.admin-doc-review-modal > .admin-doc-review-actions {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.admin-doc-review-modal > .admin-doc-review-panel {
+  margin-top: 14px;
+}
+
+
+/* --- Log Vaccine table-first workflow with modal form --- */
+.vaccine-records-main-card {
+  margin-top: 0;
+}
+
+.admin-vaccine-table-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.admin-compact-action {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  padding: 10px 16px;
+  border-radius: 999px;
+}
+
+.admin-vaccine-record-toolbar {
+  display: grid;
+  grid-template-columns: minmax(260px, 1.4fr) repeat(5, minmax(145px, 0.8fr));
+  gap: 10px;
+  align-items: center;
+  padding: 14px;
+  margin-bottom: 16px;
+  border: 1px solid #dbe7ef;
+  border-radius: 16px;
+  background: #f8fbfd;
+}
+
+.admin-vaccine-record-toolbar .input-group {
+  min-width: 0;
+}
+
+.admin-vaccine-record-toolbar input,
+.admin-vaccine-record-toolbar select {
+  min-height: 42px;
+  font-size: 0.86rem;
+  background: #ffffff;
+}
+
+.admin-vaccine-log-table th,
+.admin-vaccine-log-table td {
+  vertical-align: top;
+}
+
+.admin-vaccine-modal-backdrop {
+  z-index: 6000;
+}
+
+.admin-vaccine-log-modal {
+  width: min(980px, 100%);
+  max-height: 92vh;
+  padding: 0;
+  overflow: auto;
+}
+
+.admin-vaccine-modal-header {
+  margin: 0;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid #e2e8f0;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbfd 100%);
+}
+
+.admin-vaccine-modal-form {
+  padding: 20px 24px 22px;
+}
+
+.admin-vaccine-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.admin-selected-schedule-panel {
+  margin: 4px 0 16px;
+  padding: 14px;
+  border: 1px solid #dbe7ef;
+  border-radius: 16px;
+  background: #f8fbfd;
+}
+
+.admin-selected-baby-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.admin-selected-baby-summary strong,
+.admin-selected-baby-summary span {
+  display: block;
+}
+
+.admin-selected-baby-summary strong {
+  color: var(--color-dark);
+  font-size: 0.98rem;
+}
+
+.admin-selected-baby-summary span:not(.badge) {
+  color: #64748b;
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
+
+.admin-modal-schedule-list {
+  max-height: 190px;
+  overflow: auto;
+}
+
+.admin-vaccine-remarks {
+  width: 100%;
+  min-height: 90px;
+  padding: 12px 15px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: #f8fafc;
+  resize: vertical;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.admin-vaccine-remarks:focus {
+  background: #ffffff;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+}
+
+.admin-vaccine-modal-actions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 16px;
+  margin-top: 4px;
+  border-top: 1px solid #e2e8f0;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+}
+
+@media (max-width: 1240px) {
+  .admin-vaccine-record-toolbar {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .admin-log-search {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-vaccine-table-heading {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-compact-action {
+    width: 100%;
+  }
+
+  .admin-vaccine-record-toolbar,
+  .admin-vaccine-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-vaccine-log-modal {
+    max-height: 96vh;
+  }
+
+  .admin-vaccine-modal-header,
+  .admin-vaccine-modal-form {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .admin-selected-baby-summary,
+  .admin-vaccine-modal-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-vaccine-modal-actions .btn {
+    width: 100%;
+  }
+}
+
+/* --- Compact Overview action workflow layout: keep medical and document work visible --- */
+.admin-overview-page .metric-cards,
+.admin-kpi-grid {
+  margin-bottom: 16px;
+}
+
+.admin-overview-page .overview-action-sections {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.admin-overview-page .overview-action-sections .admin-action-table-card {
+  min-width: 0;
+}
+
+.admin-overview-page .overview-action-sections .overview-card-heading {
+  padding: 18px 20px 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+
+.admin-overview-page .overview-action-sections .card-title {
+  font-size: 1rem;
+  margin: 0 0 4px;
+}
+
+.admin-overview-page .overview-action-sections .admin-card-subtitle {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  max-width: 48rem;
+}
+
+.admin-overview-section-actions {
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.admin-row-limit-note {
+  color: #64748b;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.admin-view-all-btn {
+  min-height: 30px;
+  padding: 6px 10px !important;
+  font-size: 0.74rem !important;
+}
+
+.admin-overview-page .overview-action-sections .admin-alert-filter-row {
+  padding: 10px 20px;
+  gap: 6px;
+}
+
+.admin-overview-page .overview-action-sections .admin-filter-pill {
+  min-height: 28px;
+  padding: 5px 10px;
+  font-size: 0.72rem;
+}
+
+.admin-overview-page .overview-action-sections .table-responsive {
+  max-height: 360px;
+  overflow: auto;
+}
+
+.admin-overview-page .overview-action-sections .overview-alerts-table {
+  min-width: 640px;
+}
+
+.admin-overview-page .overview-action-sections .overview-alerts-table th,
+.admin-overview-page .overview-action-sections .overview-alerts-table td {
+  padding: 12px 14px;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  vertical-align: middle;
+}
+
+.admin-overview-page .overview-action-sections .overview-alerts-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.admin-overview-page .overview-action-sections .overview-alerts-table .btn-sm {
+  padding: 6px 10px;
+  min-height: 30px;
+  white-space: nowrap;
+}
+
+@media (max-width: 1220px) {
+  .admin-overview-page .overview-action-sections {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-overview-page .overview-action-sections .table-responsive {
+    max-height: 320px;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-overview-page .overview-action-sections {
+    gap: 14px;
+  }
+
+  .admin-overview-page .overview-action-sections .overview-card-heading {
+    padding: 16px 18px 12px;
+  }
+
+  .admin-overview-section-actions {
+    justify-content: stretch;
+  }
+
+  .admin-row-limit-note {
+    width: 100%;
+  }
+
+  .admin-view-all-btn,
+  .admin-export-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .admin-overview-page .overview-action-sections .overview-alerts-table th,
+  .admin-overview-page .overview-action-sections .overview-alerts-table td {
+    padding: 11px 12px;
+  }
+}
+
+/* --- Overview Action Items segmented workflow --- */
+.admin-action-items-card {
+  width: 100%;
+  overflow: hidden;
+}
+
+.admin-action-items-heading {
+  align-items: center;
+}
+
+.admin-action-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 16px 22px 12px;
+  padding: 6px;
+  border: 1px solid #dbe7ef;
+  border-radius: 999px;
+  background: #f1f7fb;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.admin-action-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.admin-action-toggle-btn:hover {
+  color: #0369a1;
+  background: rgba(224, 242, 254, 0.75);
+}
+
+.admin-action-toggle-btn.active {
+  color: #075985;
+  background: #ffffff;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.09);
+}
+
+.admin-toggle-count {
+  min-width: 24px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 0.72rem;
+  font-weight: 900;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.admin-action-toggle-btn.active .admin-toggle-count {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+.admin-action-panel {
+  display: none;
+}
+
+.admin-action-panel.active {
+  display: block;
+}
+
+
+
+
+.admin-action-items-card .admin-alert-filter-row {
+  padding: 8px 22px 10px;
+}
+
+.admin-action-table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.admin-action-items-table {
+  width: 100%;
+  min-width: 0 !important;
+  table-layout: auto;
+}
+
+.admin-action-items-table th,
+.admin-action-items-table td {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.admin-action-items-table td:last-child,
+.admin-action-items-table th:last-child {
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .admin-action-items-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-action-toggle {
+    display: flex;
+    width: calc(100% - 36px);
+    margin: 14px 18px 10px;
+  }
+
+  .admin-action-toggle-btn {
+    flex: 1 1 0;
+  }
+}
+
+@media (max-width: 680px) {
+  .admin-action-items-card .admin-alert-filter-row {
+    padding: 10px 16px;
+  }
+
+
+  .admin-action-table-responsive {
+    overflow-x: visible;
+  }
+
+  .admin-action-items-table,
+  .admin-action-items-table thead,
+  .admin-action-items-table tbody,
+  .admin-action-items-table tr,
+  .admin-action-items-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .admin-action-items-table thead {
+    display: none;
+  }
+
+  .admin-action-items-table tr {
+    padding: 14px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #ffffff;
+  }
+
+  .admin-action-items-table td {
+    display: grid;
+    grid-template-columns: minmax(100px, 36%) minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+    padding: 8px 0 !important;
+    text-align: left !important;
+    border: 0 !important;
+    font-size: 0.86rem !important;
+    white-space: normal !important;
+  }
+
+  .admin-action-items-table td::before {
+    content: attr(data-label);
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .admin-action-items-table td[colspan] {
+    display: block;
+    text-align: center !important;
+  }
+
+  .admin-action-items-table td[colspan]::before {
+    content: none;
+  }
+
+  .admin-action-items-table td .btn {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+/* --- Compact Action Items toolbar: toggle and export on one row --- */
+.admin-action-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 22px 10px;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.admin-action-toolbar .admin-action-toggle {
+  width: auto;
+  margin: 0;
+}
+
+.admin-action-toolbar .admin-overview-section-actions {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.admin-action-toolbar .admin-export-btn {
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .admin-action-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 14px 16px 10px;
+  }
+
+  .admin-action-toolbar .admin-action-toggle {
+    width: 100%;
+  }
+
+  .admin-action-toolbar .admin-action-toggle-btn {
+    flex: 1 1 0;
+  }
+
+  .admin-action-toolbar .admin-overview-section-actions,
+  .admin-action-toolbar .admin-export-btn {
+    width: 100%;
+  }
+
+  .admin-action-toolbar .admin-export-btn {
+    justify-content: center;
+  }
+}
+
+/* --- Compact one-line Vaccination Administration Records table --- */
+.admin-vaccine-page .admin-table-shell {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.admin-vaccine-log-table {
+  min-width: 1320px;
+  table-layout: auto;
+}
+
+.admin-vaccine-log-table th,
+.admin-vaccine-log-table td {
+  padding: 10px 12px !important;
+  font-size: 0.82rem !important;
+  line-height: 1.25 !important;
+  white-space: nowrap;
+  vertical-align: middle !important;
+}
+
+.admin-vaccine-log-table th {
+  font-size: 0.69rem !important;
+}
+
+.admin-vaccine-log-table th:nth-child(1),
+.admin-vaccine-log-table td:nth-child(1) { width: 128px; min-width: 128px; }
+
+.admin-vaccine-log-table th:nth-child(2),
+.admin-vaccine-log-table td:nth-child(2) { width: 190px; min-width: 190px; }
+
+.admin-vaccine-log-table th:nth-child(3),
+.admin-vaccine-log-table td:nth-child(3) { width: 210px; min-width: 210px; }
+
+.admin-vaccine-log-table th:nth-child(4),
+.admin-vaccine-log-table td:nth-child(4) { width: 170px; min-width: 170px; }
+
+.admin-vaccine-log-table th:nth-child(5),
+.admin-vaccine-log-table td:nth-child(5) { width: 86px; min-width: 86px; }
+
+.admin-vaccine-log-table th:nth-child(6),
+.admin-vaccine-log-table td:nth-child(6) { width: 145px; min-width: 145px; }
+
+.admin-vaccine-log-table th:nth-child(7),
+.admin-vaccine-log-table td:nth-child(7) { width: 170px; min-width: 170px; }
+
+.admin-vaccine-log-table th:nth-child(8),
+.admin-vaccine-log-table td:nth-child(8) { width: 220px; min-width: 220px; }
+
+.admin-vaccine-log-table .admin-mono,
+.vaccine-log-id,
+.vaccine-log-batch {
+  font-size: 0.76rem !important;
+  white-space: nowrap;
+}
+
+.vaccine-log-date,
+.vaccine-log-baby-name,
+.vaccine-log-vaccine,
+.vaccine-log-dose,
+.vaccine-log-worker {
+  display: inline-block;
+  color: var(--color-dark);
+  font-size: 0.82rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.vaccine-log-baby-name {
+  margin-right: 8px;
+}
+
+.vaccine-log-reg {
+  display: inline-block;
+  color: #64748b;
+  font-size: 0.74rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.vaccine-log-reg::before {
+  content: "• ";
+  color: #94a3b8;
+}
+
+.reaction-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: none;
+  color: #475569;
+  font-size: 0.76rem;
+  font-weight: 650;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.admin-vaccine-log-table .reaction-flag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+
+.admin-vaccine-log-table .admin-muted {
+  font-size: 0.74rem;
+  white-space: nowrap;
+}
+
+.admin-vaccine-log-table tbody tr {
+  height: 42px;
+}
+
+.admin-vaccine-log-table tbody tr:hover {
+  background: #f8fbfd;
+}
+
+@media (max-width: 900px) {
+  .admin-vaccine-log-table {
+    min-width: 1240px;
+  }
+
+  .admin-vaccine-log-table th,
+  .admin-vaccine-log-table td {
+    padding: 9px 10px !important;
+    font-size: 0.78rem !important;
+  }
+
+  .vaccine-log-date,
+  .vaccine-log-baby-name,
+  .vaccine-log-vaccine,
+  .vaccine-log-dose,
+  .vaccine-log-worker {
+    font-size: 0.78rem;
+  }
+
+  .vaccine-log-reg,
+  .reaction-summary {
+    font-size: 0.72rem;
+  }
+}
+
+/* --- Compact Schedules tab with scrollable list and full-view modal --- */
+.admin-schedule-page .admin-schedule-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.admin-schedule-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.admin-icon-action,
+.admin-schedule-view-all {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  padding: 0;
+  border: 1px solid #bae6fd;
+  border-radius: 10px;
+  background: #eff6ff;
+  color: #0284c7;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.admin-icon-action:hover,
+.admin-schedule-view-all:hover {
+  background: #dbeafe;
+  border-color: #7dd3fc;
+  color: #0369a1;
+  transform: translateY(-1px);
+}
+
+.admin-event-list-scroll {
+  max-height: 430px;
+  overflow-y: auto;
+  padding-right: 4px;
+  overscroll-behavior: contain;
+}
+
+.admin-event-list-scroll::-webkit-scrollbar,
+.admin-full-schedule-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.admin-event-list-scroll::-webkit-scrollbar-thumb,
+.admin-full-schedule-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+.admin-event-list-scroll::-webkit-scrollbar-track,
+.admin-full-schedule-list::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 999px;
+}
+
+.admin-full-schedule-backdrop {
+  backdrop-filter: blur(6px);
+}
+
+.admin-full-schedule-modal {
+  width: min(980px, 100%);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.admin-full-schedule-header {
+  flex: 0 0 auto;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.admin-full-schedule-list {
+  display: grid;
+  gap: 12px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.admin-modal-event-item {
+  background: #ffffff;
+}
+
+.admin-schedule-linked-babies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.admin-schedule-linked-babies span {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #dbe7ef;
+  border-radius: 999px;
+  background: #f8fbfd;
+  color: #475569;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 4px 8px;
+}
+
+@media (max-width: 760px) {
+  .admin-schedule-toolbar {
+    align-items: stretch;
+    justify-content: space-between;
+  }
+
+  .admin-schedule-toolbar .btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .admin-event-list-scroll {
+    max-height: 360px;
+  }
+
+  .admin-full-schedule-modal {
+    max-height: 92vh;
+  }
+}
+
+/* --- Admin table vertical alignment polish --- */
+.admin-layout table th,
+.admin-layout table td,
+.admin-data-table th,
+.admin-data-table td,
+.admin-masterlist-table th,
+.admin-masterlist-table td,
+.admin-vaccine-log-table th,
+.admin-vaccine-log-table td,
+.admin-doc-review-table th,
+.admin-doc-review-table td,
+.admin-action-items-table th,
+.admin-action-items-table td,
+.compact-table th,
+.compact-table td {
+  vertical-align: middle !important;
+}
+
+.admin-data-table tbody tr,
+.admin-masterlist-table tbody tr,
+.admin-vaccine-log-table tbody tr,
+.admin-doc-review-table tbody tr,
+.admin-action-items-table tbody tr,
+.compact-table tbody tr {
+  height: auto;
+}
+
+.admin-layout table .badge,
+.admin-layout table .btn,
+.admin-layout table button,
+.admin-layout table .admin-type-pill,
+.admin-layout table .admin-mono,
+.admin-layout table .directory-primary-text,
+.admin-layout table .directory-secondary-text,
+.admin-layout table .directory-status-line,
+.admin-layout table .directory-status-detail,
+.admin-layout table .vaccine-log-date,
+.admin-layout table .vaccine-log-baby-name,
+.admin-layout table .vaccine-log-reg,
+.admin-layout table .vaccine-log-vaccine,
+.admin-layout table .vaccine-log-dose,
+.admin-layout table .vaccine-log-batch,
+.admin-layout table .vaccine-log-worker,
+.admin-layout table .reaction-summary,
+.admin-layout table .admin-muted,
+.admin-layout table .review-doc-btn,
+.admin-layout table .admin-record-inline-trigger {
+  vertical-align: middle;
+}
+
+.admin-layout table .badge,
+.admin-layout table .btn,
+.admin-layout table button,
+.admin-layout table .admin-type-pill,
+.admin-layout table .reaction-summary,
+.admin-layout table .directory-status-line,
+.admin-layout table .admin-record-inline-trigger,
+.admin-layout table .review-doc-btn {
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-layout table .badge,
+.admin-layout table .admin-type-pill {
+  display: inline-flex;
+  min-height: 22px;
+  line-height: 1;
+}
+
+.admin-layout table .btn,
+.admin-layout table .review-doc-btn {
+  display: inline-flex;
+  min-height: 30px;
+  line-height: 1;
+}
+
+.admin-layout table td.text-center,
+.admin-layout table th.text-center {
+  text-align: center;
+}
+
+.admin-layout table td.text-right,
+.admin-layout table th.text-right {
+  text-align: right;
+}
+
+.admin-doc-review-table td:last-child,
+.admin-doc-review-table th:last-child,
+.admin-action-items-table td:last-child,
+.admin-action-items-table th:last-child {
+  vertical-align: middle !important;
+}
+
+.admin-doc-review-table td:last-child,
+.admin-action-items-table td:last-child {
+  white-space: nowrap;
+}
+
+.admin-vaccine-log-table .reaction-summary,
+.admin-vaccine-log-table .admin-muted,
+.admin-masterlist-table .directory-status-line,
+.admin-masterlist-table .admin-directory-name-content {
+  min-height: 24px;
+}
+
+.admin-schedule-page .compact-table th,
+.admin-schedule-page .compact-table td {
+  vertical-align: middle !important;
+}
+
+.schedule-item.admin-event-item,
+.admin-event-item {
+  align-items: center;
+}
+
+.admin-event-actions,
+.admin-schedule-toolbar {
+  align-items: center;
+}
+
+@media (max-width: 680px) {
+  .admin-action-items-table td {
+    align-items: center;
+  }
+
+  .admin-action-items-table td::before {
+    align-self: center;
+  }
+}

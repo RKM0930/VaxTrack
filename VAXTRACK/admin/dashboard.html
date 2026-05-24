@@ -28,40 +28,75 @@
       <a href="schedule-management.html" data-i18n="nav.schedules"><i class="fas fa-calendar-alt" style="width:25px"></i> Schedules</a>
     </aside>
     <main class="main-content admin-overview-page" style="max-width:100%">
-      <section class="page-hero admin-overview-hero">
-        <div>
-          <p class="page-kicker" data-i18n="admin.hero_kicker">BHW Dashboard</p>
-          <h1 data-i18n="admin.hero_title">Barangay vaccination records, mas madaling i-manage</h1>
-          <p data-i18n="admin.hero_sub">Review documents, hanapin ang baby records, at i-update ang vaccination history mula sa isang organized dashboard.</p>
-        </div>
-      </section>
-
-      <div class="metric-cards">
-        <div class="card metric-card"><div class="number" id="totalBabies">0</div><span data-i18n="admin.total_registered">Total Registered</span></div>
-        <div class="card metric-card"><div class="number" id="vaccinesMonth" style="color:var(--color-success)">0</div><span data-i18n="admin.vaccines_month">Bakuna This Month</span></div>
-        <div class="card metric-card"><div class="number" id="upcomingWeek" style="color:var(--color-warning)">0</div><span data-i18n="admin.upcoming_7_days">Upcoming (7 Days)</span></div>
-        <div class="card metric-card"><div class="number" id="overdueCount" style="color:var(--color-danger)">0</div><span data-i18n="admin.overdue_alerts">Overdue Alerts</span></div>
-        <div class="card metric-card"><div class="number" id="pendingDocs" style="color:var(--color-primary)">0</div><span data-i18n="admin.pending_documents">Pending Documents</span></div>
+      <div class="metric-cards admin-kpi-grid">
+        <div class="card metric-card"><span class="metric-label" data-i18n="admin.total_registered">Total Registered</span><div class="number" id="totalBabies">0</div><small>Registered baby records</small></div>
+        <div class="card metric-card"><span class="metric-label" data-i18n="admin.vaccines_month">Vaccines This Month</span><div class="number" id="vaccinesMonth">0</div><small>Recorded administrations</small></div>
+        <div class="card metric-card"><span class="metric-label" data-i18n="admin.upcoming_7_days">Upcoming Appointments</span><div class="number" id="upcomingWeek">0</div><small>Next 7 days</small></div>
+        <div class="card metric-card metric-danger"><span class="metric-label" data-i18n="admin.overdue_alerts">Overdue Alerts</span><div class="number" id="overdueCount">0</div><small>Requires action</small></div>
+        <div class="card metric-card"><span class="metric-label" data-i18n="admin.pending_documents">Pending Documents</span><div class="number" id="pendingDocs">0</div><small>For review</small></div>
       </div>
 
-      <section class="overview-lower-grid" aria-label="BHW overview actions and alerts">
-        <div class="card overview-workflow-panel">
-          <h3 class="card-title">Clinic Workflow</h3>
-          <div class="admin-workflow overview-workflow" aria-label="Clinic workflow">
-            <div class="workflow-card"><i class="fas fa-file-circle-check"></i><div><strong data-i18n="nav.verify_docs">Verify Docs</strong><p data-i18n="admin.workflow_verify">Verify uploaded birth certificates</p></div></div>
-            <div class="workflow-card"><i class="fas fa-search"></i><div><strong data-i18n="nav.directory">Directory</strong><p data-i18n="admin.workflow_search">Search baby records during clinic visits</p></div></div>
-            <div class="workflow-card"><i class="fas fa-syringe"></i><div><strong data-i18n="nav.log_vaccine">Log Vaccine</strong><p data-i18n="admin.workflow_update">Update vaccine records after administration</p></div></div>
+      <section class="card admin-action-items-card admin-action-table-card">
+        <div class="admin-action-toolbar">
+          <div class="admin-action-toggle" role="tablist" aria-label="Action item workflow toggle">
+            <button type="button" class="admin-action-toggle-btn active" id="medicalActionToggle" data-action-view="medical" role="tab" aria-selected="true" aria-controls="medicalActionPanel">
+              <i class="fas fa-syringe"></i>
+              <span>Medical Alerts</span>
+              <span class="admin-toggle-count" id="medicalToggleCount">0</span>
+            </button>
+            <button type="button" class="admin-action-toggle-btn" id="documentActionToggle" data-action-view="documents" role="tab" aria-selected="false" aria-controls="documentActionPanel">
+              <i class="fas fa-file-contract"></i>
+              <span>Documents</span>
+              <span class="admin-toggle-count" id="documentToggleCount">0</span>
+            </button>
+          </div>
+          <div class="admin-section-actions admin-overview-section-actions">
+            <button type="button" class="btn btn-outline btn-sm admin-export-btn"><i class="fas fa-download"></i> Export Report</button>
           </div>
         </div>
 
-        <div class="card overview-alerts-card">
-          <div class="overview-card-heading">
-            <h3 class="card-title" data-i18n="admin.urgent_alerts">Urgent Alerts</h3>
+        <div class="admin-action-panel active" id="medicalActionPanel" role="tabpanel" aria-labelledby="medicalActionToggle" data-action-panel="medical">
+          <div class="admin-alert-filter-row" aria-label="Medical alert filters">
+            <button type="button" class="admin-filter-pill active" data-medical-filter="All">All</button>
+            <button type="button" class="admin-filter-pill" data-medical-filter="Overdue">Overdue</button>
+            <button type="button" class="admin-filter-pill" data-medical-filter="Due Soon">Due Soon</button>
+            <button type="button" class="admin-filter-pill" data-medical-filter="Action Required">Action Required</button>
           </div>
-          <div class="table-responsive">
-            <table id="alertsTable" class="overview-alerts-table">
-              <thead><tr><th data-i18n="table.baby_name">Baby Name</th><th data-i18n="table.vaccine">Vaccine</th><th data-i18n="table.target">Target Date</th><th data-i18n="table.status">Status</th></tr></thead>
-              <tbody id="alertsList"></tbody>
+          <div class="table-responsive admin-action-table-responsive">
+            <table id="medicalAlertsTable" class="overview-alerts-table admin-data-table admin-action-items-table">
+              <thead>
+                <tr>
+                  <th>Baby Name</th>
+                  <th>Medical Item</th>
+                  <th>Target Date</th>
+                  <th>Status</th>
+                  <th class="text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="medicalAlertsList"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="admin-action-panel" id="documentActionPanel" role="tabpanel" aria-labelledby="documentActionToggle" data-action-panel="documents" hidden>
+          <div class="admin-alert-filter-row" aria-label="Document action item filters">
+            <button type="button" class="admin-filter-pill active" data-document-filter="All">All</button>
+            <button type="button" class="admin-filter-pill" data-document-filter="Pending">Pending</button>
+            <button type="button" class="admin-filter-pill" data-document-filter="Rejected">Rejected</button>
+            <button type="button" class="admin-filter-pill" data-document-filter="Re-upload Requested">Re-upload Requested</button>
+          </div>
+          <div class="table-responsive admin-action-table-responsive">
+            <table id="documentActionsTable" class="overview-alerts-table admin-data-table admin-action-items-table">
+              <thead>
+                <tr>
+                  <th>Baby Name</th>
+                  <th>Document</th>
+                  <th>Date Uploaded</th>
+                  <th>Status</th>
+                  <th class="text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="documentActionsList"></tbody>
             </table>
           </div>
         </div>

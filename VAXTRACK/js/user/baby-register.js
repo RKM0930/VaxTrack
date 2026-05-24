@@ -155,16 +155,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       showLoading(getTranslation('baby_register.loading'));
-      const result = await apiFetch('/babies', { method: 'POST', body: JSON.stringify(payload) });
-
-      if (result._fallback) {
-        if (isDuplicateBabyRecord(payload)) {
-          showToast(getTranslation('baby_register.duplicate'), 'error');
-          return;
-        }
-        await registerBabyRecord(payload);
-      }
-
+      await apiFetch('/babies', { method: 'POST', body: JSON.stringify(payload) });
+      registerBabyRecord(payload);
       showToast(getTranslation('baby_register.success'));
       form.reset();
       resetUploadUi();
