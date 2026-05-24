@@ -1,28 +1,65 @@
 /* FILE: js/user/baby-profile.js */
 import { requireAuth } from '../auth.js';
-import { getBabyById } from '../api.js';
+import { getBabyById, apiFetch } from '../api.js';
 import { showLoading, hideLoading, formatBabyAge, formatValue, formatDate, statusClass, sortByDateAsc, sortByDateDesc, openDocumentModal } from '../utils.js';
 import { setupI18n, getTranslation } from '../i18n.js';
 
 requireAuth();
 
+const normalize = (baby) => ({
+  ...baby,
+  name: baby.name || `${baby.first_name} ${baby.middle_name || ''} ${baby.last_name}`.trim(),
+  registrationNumber: baby.registrationNumber || baby.registration_number,
+  registrationStatus: baby.registrationStatus || baby.registration_status,
+  guardianName: baby.guardianName || baby.guardian_name,
+  guardianPhone: baby.guardianPhone || baby.guardian_phone,
+  guardianAddress: baby.guardianAddress || baby.guardian_address,
+  motherName: baby.motherName || baby.mother_name,
+  fatherName: baby.fatherName || baby.father_name,
+  placeOfBirth: baby.placeOfBirth || baby.place_of_birth,
+  birthWeight: baby.birthWeight || baby.birth_weight,
+  bloodType: baby.bloodType || baby.blood_type,
+  privateClinic: baby.privateClinic ?? Boolean(baby.private_clinic),
+  privateClinicName: baby.privateClinicName || baby.private_clinic_name,
+  upcoming: (baby.upcoming || []).map(u => ({
+    ...u,
+    targetDate: u.targetDate || u.target_date,
+  })),
+  documents: (baby.documents || []).map(d => ({
+    ...d,
+    uploadDate: d.uploadDate || d.upload_date,
+  })),
+});
+
 let currentBabyRecord = null;
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   setupI18n();
   showLoading();
-  setTimeout(() => {
-    const params = new URLSearchParams(window.location.search);
-    currentBabyRecord = getBabyById(params.get('id'));
 
-    if (!currentBabyRecord) {
-      document.getElementById('profileContent').innerHTML = `<div class="empty-state">${getTranslation('profile.not_found')}</div>`;
-      hideLoading(); return;
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+
+  try {
+    const data = await apiFetch('/babies');
+    if (data && Array.isArray(data)) {
+      currentBabyRecord = data.map(normalize).find(b => String(b.id) === String(id)) || null;
+    } else {
+      throw new Error('Fallback');
     }
+  } catch (err) {
+    console.warn('[API] Falling back to mock:', err.message);
+    currentBabyRecord = getBabyById(id);
+  }
 
-    renderProfileData();
+  if (!currentBabyRecord) {
+    document.getElementById('profileContent').innerHTML = `<div class="empty-state">${getTranslation('profile.not_found')}</div>`;
     hideLoading();
-  }, 300);
+    return;
+  }
+
+  renderProfileData();
+  hideLoading();
 });
 
 function bindDocumentButtons() {
