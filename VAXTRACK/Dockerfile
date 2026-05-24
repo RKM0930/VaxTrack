@@ -6,4 +6,4 @@ WORKDIR /app
 
 COPY . .
 
-CMD ["sh", "-c", "php -S 0.0.0.0:$PORT -t /app/VAXTRACK/backend /app/VAXTRACK/backend/index.php"]
+CMD ["sh", "-c", "find /app -type f -name '*.php' | head -20 && php -S 0.0.0.0:$PORT -t /app/backend /app/backend/index.php"]
