@@ -1,9 +1,9 @@
 <?php
-define('DB_HOST', 'kodama.proxy.rlwy.net');
-define('DB_PORT', '54418');
-define('DB_USER', 'root');
-define('DB_PASS', 'wCKIaHZFQzhDcSNKwGStQDfrMqjUhFQV');
-define('DB_NAME', 'railway');
+define('DB_HOST', getenv('MYSQLHOST') ?: 'mysql.railway.internal');
+define('DB_PORT', getenv('MYSQLPORT') ?: '3306');
+define('DB_USER', getenv('MYSQLUSER') ?: 'root');
+define('DB_PASS', getenv('MYSQLPASSWORD') ?: 'wCKIaHZFQzhDcSNKwGStQDfrMqjUhFQV');
+define('DB_NAME', getenv('MYSQLDATABASE') ?: 'railway');
 
 function getDB() {
   static $pdo = null;
