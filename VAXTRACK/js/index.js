@@ -78,7 +78,7 @@ document.getElementById('parentLoginForm').addEventListener('submit', async (e) 
         localStorage.setItem('vax_email', data.email);
         localStorage.setItem('vax_name', data.name);
         localStorage.setItem('vax_id', data.id);
-        window.location.href = 'user/dashboard.html';
+        setTimeout(() => { window.location.href = 'user/dashboard.html'; }, 900);
         return;
       }
     } catch (apiErr) {

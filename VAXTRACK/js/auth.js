@@ -126,7 +126,8 @@ export function clearToken() {
 }
 
 export function requireAuth() {
-  if (!getToken() || localStorage.getItem('vax_role') !== 'user') clearToken();
+  const role = localStorage.getItem('vax_role');
+  if (!getToken() || (role !== 'user' && role !== 'parent')) clearToken();
 }
 
 export function requireAdminAuth() {
