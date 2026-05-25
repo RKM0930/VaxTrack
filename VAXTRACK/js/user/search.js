@@ -1,6 +1,7 @@
 import { requireAuth, setupNav } from '../auth.js';
 import { apiFetch } from '../api.js';
 import { setupI18n, getTranslation } from '../i18n.js';
+import { filterActiveBabies } from '../utils.js';
 
 requireAuth();
 
@@ -24,7 +25,7 @@ function normalizeBaby(baby = {}) {
 async function loadBabies() {
   try {
     const data = await apiFetch('/babies');
-    babies = Array.isArray(data) ? data.map(normalizeBaby) : [];
+    babies = Array.isArray(data) ? filterActiveBabies(data.map(normalizeBaby)) : [];
   } catch (err) {
     console.warn('[API] Unable to load search records from database:', err.message);
     babies = [];

@@ -1,6 +1,6 @@
 import { requireAdminAuth, setupNav } from '../auth.js';
-import { apiFetch, addVaccinationRecord } from '../api.js';
-import { showLoading, hideLoading, showToast, formatDate, statusClass, sortByDateAsc, sortByDateDesc } from '../utils.js';
+import { apiFetch, addVaccinationRecord, downloadAdminFilteredCsv } from '../api.js';
+import { showLoading, hideLoading, showToast, formatDate, statusClass, sortByDateAsc, sortByDateDesc, filterActiveBabies } from '../utils.js';
 import { setupI18n, getTranslation } from '../i18n.js';
 
 requireAdminAuth();
@@ -33,7 +33,7 @@ function normalizeBabyRecord(baby = {}) {
 
 async function loadBabiesFromDatabase() {
   const data = await apiFetch('/babies');
-  allBabies = Array.isArray(data) ? data.map(normalizeBabyRecord) : [];
+  allBabies = Array.isArray(data) ? filterActiveBabies(data.map(normalizeBabyRecord)) : [];
 }
 
 function escapeHtml(value = '') {
@@ -138,6 +138,29 @@ function refreshLogTable() {
   if (logList) logList.innerHTML = renderLogTableRows();
 }
 
+function exportFilteredVaccineLogsCsv() {
+  const rows = getFilteredLogs().map(log => [
+    log.logId || '',
+    formatDateTime(log.date),
+    log.babyName || '',
+    log.registrationNumber || '',
+    log.vaccine || '',
+    log.dose ? `Dose ${log.dose}` : '',
+    log.batchNo || '',
+    log.administeredBy || '',
+    log.source || '',
+    log.reaction || ''
+  ]);
+
+  downloadAdminFilteredCsv({
+    filenamePrefix: 'vaxtrack-vaccine-logs-filtered',
+    headers: ['Log ID', 'Date & Time', 'Baby Name', 'Registration No.', 'Vaccine Type', 'Dose', 'Lot/Batch No.', 'Administered By', 'Source/Clinic', 'Reaction / Remarks'],
+    rows,
+    emptyMessage: 'No vaccination records match the current filters.'
+  });
+  showToast('Filtered vaccination records CSV downloaded successfully.');
+}
+
 function renderRecordFilters() {
   const vaccineOptions = getVaccineOptions();
   return `
@@ -178,7 +201,9 @@ function renderVaccineEntry(autoOpenFromQuery = true) {
           <h3 class="card-title">Vaccination Administration Records</h3>
           <p class="admin-card-subtitle">Review logged vaccines first. Use the compact action to record a new administered vaccine only when needed.</p>
         </div>
-        <button type="button" class="btn btn-primary admin-compact-action" id="openVaccineModalBtn"><i class="fas fa-syringe"></i> Log Vaccine</button>
+        <div class="admin-table-action-group">
+          <button type="button" class="btn btn-primary admin-compact-action" id="openVaccineModalBtn"><i class="fas fa-syringe"></i> Log Vaccine</button>
+        </div>
       </div>
       ${renderRecordFilters()}
       <div class="table-responsive admin-table-shell">

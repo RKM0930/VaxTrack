@@ -1352,6 +1352,7 @@
 /* --- Admin Directory baby record modal --- */
 .admin-baby-record-modal {
   background: rgba(15, 23, 42, 0.56);
+  z-index: 5000;
   backdrop-filter: blur(2px);
 }
 
@@ -3104,4 +3105,485 @@
   .admin-doc-review-table td .status-summary-cell {
     justify-content: flex-end;
   }
+}
+
+/* --- Controlled delete for tester/sample baby records --- */
+.admin-record-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.admin-record-modal-summary .admin-record-modal-actions .btn {
+  margin-left: 0;
+}
+
+.admin-danger-action,
+.admin-layout .admin-danger-action {
+  border-color: #fecaca !important;
+  color: #b91c1c !important;
+  background: #fff7f7 !important;
+}
+
+.admin-danger-action:hover,
+.admin-danger-action:focus-visible {
+  background: #fee2e2 !important;
+  border-color: #fca5a5 !important;
+  color: #991b1b !important;
+}
+
+.admin-delete-protected-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  color: #64748b;
+  background: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.admin-delete-confirm-modal {
+  background: rgba(15, 23, 42, 0.66);
+  backdrop-filter: blur(2px);
+  z-index: 7000 !important;
+}
+
+.admin-delete-confirm-card {
+  width: min(500px, 94vw);
+  padding: 0 !important;
+  overflow: hidden;
+  position: relative;
+  z-index: 7001;
+}
+
+.admin-delete-confirm-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 22px 14px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #ffffff;
+}
+
+.admin-archive-record-summary {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-archive-record-summary strong {
+  color: #0f172a;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.admin-archive-record-summary span {
+  color: #64748b;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.admin-archive-confirm-message {
+  margin: 0;
+  color: #334155;
+  line-height: 1.55;
+}
+
+.danger-kicker {
+  color: #64748b !important;
+}
+
+.admin-delete-confirm-body {
+  display: grid;
+  gap: 16px;
+  padding: 18px 22px;
+}
+
+.admin-delete-warning-box {
+  display: none;
+}
+
+.admin-delete-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 22px 20px;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.admin-archive-final:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+}
+
+.admin-archive-cancel,
+.admin-layout .admin-archive-cancel {
+  border-color: #cbd5e1 !important;
+  background: #ffffff !important;
+  color: #475569 !important;
+}
+
+.admin-archive-cancel:hover,
+.admin-archive-cancel:focus-visible {
+  border-color: #94a3b8 !important;
+  background: #f8fafc !important;
+  color: #334155 !important;
+}
+
+@media (max-width: 760px) {
+  .admin-record-modal-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .admin-record-modal-actions .btn,
+  .admin-delete-protected-note {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .admin-delete-confirm-actions {
+    flex-direction: column-reverse;
+  }
+
+  .admin-delete-confirm-actions .btn,
+  .admin-delete-confirm-actions .btn-danger {
+    width: 100%;
+  }
+}
+
+/* --- Filter-aware CSV export controls --- */
+.admin-filter-toolbar {
+  grid-template-columns: minmax(260px, 1fr) minmax(160px, 190px) minmax(160px, 190px) auto;
+}
+
+.admin-filter-toolbar .admin-export-btn {
+  justify-self: end;
+  white-space: nowrap;
+}
+
+.admin-doc-toolbar {
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-doc-toolbar .admin-doc-filter-row {
+  flex: 1 1 auto;
+}
+
+.admin-doc-toolbar .admin-export-btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.admin-table-action-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-table-action-group .btn {
+  white-space: nowrap;
+}
+
+@media (max-width: 1024px) {
+  .admin-filter-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-filter-toolbar .admin-export-btn {
+    justify-self: stretch;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-doc-toolbar,
+  .admin-table-action-group {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-doc-toolbar .admin-export-btn,
+  .admin-table-action-group .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* --- Controlled edit for Admin/BHW baby records --- */
+.admin-edit-record-trigger,
+.admin-layout .admin-edit-record-trigger {
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
+  background: #eff6ff !important;
+}
+
+.admin-edit-record-trigger:hover,
+.admin-edit-record-trigger:focus-visible {
+  background: #dbeafe !important;
+  border-color: #93c5fd !important;
+  color: #1e40af !important;
+}
+
+.admin-edit-record-modal {
+  background: rgba(15, 23, 42, 0.62);
+  backdrop-filter: blur(2px);
+  z-index: 7200 !important;
+}
+
+.admin-edit-record-card {
+  width: min(920px, 96vw);
+  max-height: 92vh;
+  padding: 0 !important;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 7201;
+}
+
+.admin-edit-record-header,
+.admin-edit-confirm-header {
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid #dbeafe;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.admin-edit-record-header h2,
+.admin-edit-confirm-header h2 {
+  margin: 3px 0 4px;
+  color: var(--color-dark);
+  font-size: 1.35rem;
+}
+
+.admin-edit-record-header p:not(.page-kicker),
+.admin-edit-confirm-header p:not(.page-kicker) {
+  color: #64748b;
+  font-size: 0.88rem;
+}
+
+.admin-edit-record-body {
+  overflow-y: auto;
+  padding: 20px 22px;
+  display: grid;
+  gap: 16px;
+}
+
+.admin-edit-warning-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #bfdbfe;
+  border-radius: 14px;
+  background: #eff6ff;
+  color: #1e3a8a;
+}
+
+.admin-edit-warning-box i {
+  margin-top: 2px;
+  color: #2563eb;
+}
+
+.admin-edit-warning-box strong,
+.admin-edit-warning-box span {
+  display: block;
+}
+
+.admin-edit-warning-box span {
+  margin-top: 5px;
+  color: #475569;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.admin-edit-section {
+  border: 1px solid #dbe7ef;
+  border-radius: 16px;
+  background: #fff;
+  padding: 16px;
+}
+
+.admin-edit-section h3 {
+  margin: 0 0 12px;
+  color: #0f172a;
+  font-size: 0.95rem;
+  letter-spacing: -0.015em;
+}
+
+.admin-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin-edit-wide-field {
+  grid-column: 1 / -1;
+}
+
+.admin-edit-checkbox-field {
+  justify-content: flex-start;
+}
+
+.admin-edit-checkline {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
+  border: 1px solid #dbe7ef;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #334155 !important;
+  font-size: 0.86rem !important;
+  font-weight: 700;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+.admin-edit-checkline input {
+  width: 16px;
+  height: 16px;
+  accent-color: #2563eb;
+}
+
+.field-group span em {
+  display: inline-flex;
+  margin-left: 6px;
+  color: #dc2626;
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.admin-edit-record-actions,
+.admin-edit-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 22px 20px;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.admin-edit-confirm-modal {
+  background: rgba(15, 23, 42, 0.68);
+  backdrop-filter: blur(2px);
+  z-index: 7300 !important;
+}
+
+.admin-edit-confirm-card {
+  width: min(620px, 94vw);
+  max-height: 90vh;
+  padding: 0 !important;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 7301;
+}
+
+.admin-edit-confirm-body {
+  overflow-y: auto;
+  padding: 20px 22px;
+  display: grid;
+  gap: 16px;
+}
+
+.admin-edit-change-list {
+  display: grid;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid #dbe7ef;
+  border-radius: 14px;
+  background: #fff;
+  padding: 10px;
+}
+
+.admin-edit-change-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.7fr) minmax(0, 1.3fr);
+  align-items: center;
+  gap: 12px;
+  padding: 8px 9px;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 0.82rem;
+}
+
+.admin-edit-change-row strong {
+  color: #0f172a;
+  font-size: 0.8rem;
+}
+
+.admin-edit-change-row span {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  line-height: 1.35;
+}
+
+.admin-edit-change-row i {
+  color: #2563eb;
+  font-size: 0.72rem;
+}
+
+.admin-maintenance-section {
+  background: #f8fafc;
+}
+
+@media (max-width: 820px) {
+  .admin-edit-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .admin-edit-grid,
+  .admin-edit-change-row {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-edit-record-actions,
+  .admin-edit-confirm-actions {
+    flex-direction: column-reverse;
+  }
+
+  .admin-edit-record-actions .btn,
+  .admin-edit-confirm-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+
+.archive-prototype-note {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.admin-restore-row {
+  margin-top: 0.4rem;
+}
+
+.admin-layout .badge.archived,
+.modal-backdrop .badge.archived {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
 }

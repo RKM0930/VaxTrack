@@ -1,5 +1,5 @@
 import { requireAdminAuth, setupNav } from '../auth.js';
-import { apiFetch, updateDocumentStatus } from '../api.js';
+import { apiFetch, updateDocumentStatus, downloadAdminFilteredCsv } from '../api.js';
 import {
   showLoading,
   hideLoading,
@@ -7,7 +7,8 @@ import {
   formatDate,
   statusClass,
   sortByDateDesc,
-  createDocumentPreviewHtml
+  createDocumentPreviewHtml,
+  filterActiveBabies
 } from '../utils.js';
 import { setupI18n, getTranslation } from '../i18n.js';
 
@@ -59,7 +60,7 @@ function normalizeBabyRecord(baby = {}) {
 
 async function loadDocumentsFromDatabase() {
   const data = await apiFetch('/babies');
-  allBabies = Array.isArray(data) ? data.map(normalizeBabyRecord) : [];
+  allBabies = Array.isArray(data) ? filterActiveBabies(data.map(normalizeBabyRecord)) : [];
 }
 
 function getDocuments() {
@@ -87,6 +88,26 @@ function renderFilterButtons() {
     button.classList.toggle('active', isActive);
     button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
   });
+}
+
+function exportFilteredDocsCsv() {
+  const rows = getFilteredDocuments().map(doc => [
+    doc.type || 'Document',
+    doc.filename || 'Uploaded file',
+    doc.baby?.name || 'Unknown baby',
+    doc.baby?.registrationNumber || '',
+    formatDate(doc.uploadDate),
+    doc.displayStatus || 'Pending',
+    doc.comment || doc.remarks || doc.reason || ''
+  ]);
+
+  downloadAdminFilteredCsv({
+    filenamePrefix: `vaxtrack-documents-${filterState.status.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+    headers: ['Document Type', 'Filename', 'Baby Name', 'Registration No.', 'Date Uploaded', 'Status', 'Admin/BHW Remarks'],
+    rows,
+    emptyMessage: 'No document records match the current filter.'
+  });
+  showToast('Filtered document CSV downloaded successfully.');
 }
 
 function renderDocs() {

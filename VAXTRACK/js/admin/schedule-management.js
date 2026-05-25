@@ -1,6 +1,6 @@
 import { requireAdminAuth, setupNav } from '../auth.js';
-import { apiFetch, dohSchedule } from '../api.js';
-import { showLoading, hideLoading, showToast, statusClass, sortByDateAsc } from '../utils.js';
+import { apiFetch, dohSchedule, downloadAdminFilteredCsv } from '../api.js';
+import { showLoading, hideLoading, showToast, statusClass, sortByDateAsc, filterActiveBabies } from '../utils.js';
 import { setupI18n } from '../i18n.js';
 
 requireAdminAuth();
@@ -23,7 +23,7 @@ function normalizeBabyRecord(baby = {}) {
 
 async function loadSchedulesFromDatabase() {
   const data = await apiFetch('/babies');
-  allBabies = Array.isArray(data) ? data.map(normalizeBabyRecord) : [];
+  allBabies = Array.isArray(data) ? filterActiveBabies(data.map(normalizeBabyRecord)) : [];
 }
 
 function getScheduleMonthDay(dateValue) {
@@ -90,6 +90,26 @@ function buildScheduleItem(event, options = {}) {
 
 function closeFullScheduleModal() {
   document.getElementById('fullScheduleModal')?.remove();
+}
+
+function exportSchedulesCsv() {
+  const rows = scheduleEvents.map(event => [
+    event.title || '',
+    event.date || '',
+    event.time || '',
+    event.location || '',
+    event.status || '',
+    event.babies?.length || 0,
+    (event.babies || []).join('; ')
+  ]);
+
+  downloadAdminFilteredCsv({
+    filenamePrefix: 'vaxtrack-schedules-filtered',
+    headers: ['Schedule Title', 'Date', 'Time', 'Location', 'Status', 'Linked Baby Count', 'Linked Baby Records'],
+    rows,
+    emptyMessage: 'No schedule records are currently shown.'
+  });
+  showToast('Filtered schedule CSV downloaded successfully.');
 }
 
 function openFullScheduleModal() {

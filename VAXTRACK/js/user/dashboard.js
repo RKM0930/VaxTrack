@@ -1,6 +1,6 @@
 import { requireAuth, setupNav } from '../auth.js';
 import { apiFetch, getCompletionProgress, isWithinDays } from '../api.js';
-import { showLoading, hideLoading, formatBabyAge, formatValue, formatDate, statusClass, sortByDateAsc, sortByDateDesc, openDocumentModal } from '../utils.js';
+import { showLoading, hideLoading, formatBabyAge, formatValue, formatDate, statusClass, sortByDateAsc, sortByDateDesc, openDocumentModal, filterActiveBabies } from '../utils.js';
 import { setupI18n, getTranslation } from '../i18n.js';
 
 requireAuth();
@@ -1544,8 +1544,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (data && Array.isArray(data)) {
         // Normalize API data to match frontend expected format, then keep every
         // baby that belongs to the current parent regardless of approval status.
-        cachedBabies = data
-          .map(normalizeBabyRecord)
+        cachedBabies = filterActiveBabies(data.map(normalizeBabyRecord))
           .filter(babyBelongsToCurrentParent);
       } else {
         throw new Error('Unexpected database response');

@@ -1,6 +1,6 @@
 import { requireAdminAuth, setupNav } from '../auth.js';
-import { apiFetch, getDashboardStats } from '../api.js';
-import { showLoading, hideLoading, formatDate, statusClass, sortByDateAsc } from '../utils.js';
+import { apiFetch, getDashboardStats, downloadAdminFilteredCsv } from '../api.js';
+import { showLoading, hideLoading, showToast, formatDate, statusClass, sortByDateAsc, filterActiveBabies } from '../utils.js';
 import { setupI18n, getTranslation } from '../i18n.js';
 
 requireAdminAuth();
@@ -242,6 +242,67 @@ function renderDocumentActionItems() {
   `).join('');
 }
 
+
+function getOverviewExportConfig() {
+  if (alertState.activeView === 'documents') {
+    const rows = getFilteredItems(alertState.documents, alertState.documentFilter).map(action => [
+      'Document Action Items',
+      action.baby,
+      action.regNo,
+      action.item,
+      formatDate(action.date),
+      action.status,
+      action.actionLabel
+    ]);
+
+    return {
+      filenamePrefix: `vaxtrack-documents-${alertState.documentFilter.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+      headers: ['Workflow', 'Baby Name', 'Registration No.', 'Document', 'Date Uploaded', 'Status', 'Action Category'],
+      rows,
+      emptyMessage: 'No document action items match the current filter.'
+    };
+  }
+
+  const rows = getFilteredItems(alertState.medical, alertState.medicalFilter).map(alert => [
+    'Medical Alerts',
+    alert.baby,
+    alert.regNo,
+    alert.item,
+    formatDate(alert.date),
+    alert.status,
+    alert.actionLabel
+  ]);
+
+  return {
+    filenamePrefix: `vaxtrack-medical-alerts-${alertState.medicalFilter.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+    headers: ['Workflow', 'Baby Name', 'Registration No.', 'Medical Item', 'Target Date', 'Status', 'Action Category'],
+    rows,
+    emptyMessage: 'No medical alerts match the current filter.'
+  };
+}
+
+function setupExportReportButton() {
+  const exportButton = document.querySelector('.admin-export-btn');
+  if (!exportButton) return;
+
+  exportButton.addEventListener('click', async () => {
+    const originalHtml = exportButton.innerHTML;
+    exportButton.disabled = true;
+    exportButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
+
+    try {
+      downloadAdminFilteredCsv(getOverviewExportConfig());
+      showToast('Filtered CSV report downloaded successfully.', 'success');
+    } catch (err) {
+      console.error('Export report error:', err);
+      showToast(err.message || 'Unable to export report.', 'error');
+    } finally {
+      exportButton.disabled = false;
+      exportButton.innerHTML = originalHtml;
+    }
+  });
+}
+
 function setupAlertFilters() {
   document.querySelectorAll('[data-action-view]').forEach(button => {
     button.addEventListener('click', () => {
@@ -277,6 +338,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupNav();
   setupI18n();
   setupAlertFilters();
+  setupExportReportButton();
   showLoading();
 
   try {
@@ -284,11 +346,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     let babies;
 
     try {
-      [stats, babies] = await Promise.all([
-        apiFetch('/dashboard/stats'),
-        apiFetch('/babies')
-      ]);
+      babies = await apiFetch('/babies');
       if (!Array.isArray(babies)) throw new Error('Unexpected database response');
+      babies = filterActiveBabies(babies.map(normalizeBaby));
+      stats = getDashboardStats(babies);
     } catch (err) {
       console.warn('[API] Unable to load dashboard data from database:', err.message);
       babies = [];

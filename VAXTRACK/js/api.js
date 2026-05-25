@@ -1,3 +1,5 @@
+import { filterActiveBabies } from './utils.js';
+
 const BASE_URL = 'https://vaxtrack-database-production.up.railway.app';
 
 const today = new Date().toISOString().split('T')[0];
@@ -53,6 +55,8 @@ function normalizeBaby(baby = {}) {
   const { guardianBarangay, guardianCity, guardianProvince, guardianZip, ...babyRecord } = baby;
   const normalized = {
     ...babyRecord,
+    id: baby.id || baby.childId || baby.child_id || baby.babyId || baby.baby_id || baby.registrationNumber || baby.registration_number || '',
+    childId: baby.childId || baby.child_id || baby.id || '',
     firstName: baby.firstName || baby.first_name || '',
     middleName: baby.middleName || baby.middle_name || '',
     lastName: baby.lastName || baby.last_name || '',
@@ -150,7 +154,7 @@ function buildPendingBabyRecord(data = {}, overrides = {}) {
 
 export async function getAllBabiesFromAPI() {
   const data = await apiFetch('/babies');
-  return Array.isArray(data) ? data.map(normalizeBaby) : [];
+  return Array.isArray(data) ? filterActiveBabies(data.map(normalizeBaby)) : [];
 }
 
 // Admin and parent screens use API data only.
@@ -218,6 +222,7 @@ export function getCompletionProgress(baby) {
 }
 
 export function getDashboardStats(babies = []) {
+  babies = filterActiveBabies(babies);
   const upcoming = babies.flatMap(baby => baby.upcoming || []);
   const vaccinations = babies.flatMap(baby => baby.vaccinations || []);
   return {
@@ -240,6 +245,299 @@ export function isWithinDays(dateStr, days) {
   return diffDays >= 0 && diffDays <= days;
 }
 
+
+function getReportFilename(prefix = 'vaxtrack-report') {
+  const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+  return `${prefix}-${stamp}.csv`;
+}
+
+function triggerCsvDownload(blobOrText, filename = getReportFilename()) {
+  const blob = blobOrText instanceof Blob
+    ? blobOrText
+    : new Blob([blobOrText], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function csvCell(value = '') {
+  const safeValue = value === null || value === undefined ? '' : String(value);
+  return `"${safeValue.replace(/"/g, '""')}"`;
+}
+
+function csvRow(values = []) {
+  return values.map(csvCell).join(',');
+}
+
+function formatReportDate(value = '') {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toISOString().slice(0, 10);
+}
+
+export function downloadAdminFilteredCsv({ filenamePrefix = 'vaxtrack-filtered-report', headers = [], rows = [], emptyMessage = 'No records match the current filters.' } = {}) {
+  const generatedAt = new Date().toISOString();
+  const safeHeaders = Array.isArray(headers) && headers.length ? headers : ['Record'];
+  const outputRows = [[...safeHeaders, 'Generated At']];
+
+  if (Array.isArray(rows) && rows.length) {
+    rows.forEach(row => {
+      const values = Array.isArray(row) ? row : safeHeaders.map(header => row?.[header] ?? row?.[header.toLowerCase?.()] ?? '');
+      outputRows.push([...values, generatedAt]);
+    });
+  } else {
+    const emptyRow = Array(safeHeaders.length).fill('');
+    emptyRow[0] = emptyMessage;
+    outputRows.push([...emptyRow, generatedAt]);
+  }
+
+  const csv = `\ufeff${outputRows.map(csvRow).join('\n')}`;
+  triggerCsvDownload(csv, getReportFilename(filenamePrefix));
+  return { source: 'frontend-filtered', rows: rows.length };
+}
+
+function buildClientAdminReportCsv(babies = []) {
+  const generatedAt = new Date().toISOString();
+  const headers = [
+    'Report Section',
+    'Record ID',
+    'Child ID',
+    'Registration No.',
+    'Baby Name',
+    'DOB',
+    'Sex',
+    'Parent/Guardian',
+    'Contact No.',
+    'Address',
+    'Registration Status',
+    'Vaccine/Item',
+    'Dose',
+    'Date',
+    'Target Date',
+    'Status',
+    'Batch/Lot',
+    'Administered By',
+    'Source/Clinic',
+    'Document Type',
+    'Document Filename',
+    'Comment/Remarks',
+    'Alert Type',
+    'Generated At'
+  ];
+
+  const rows = [headers];
+  const normalizedBabies = Array.isArray(babies) ? babies.map(normalizeBaby) : [];
+  const todayDate = new Date();
+  todayDate.setHours(0, 0, 0, 0);
+
+  const pushRow = ({
+    section = '', recordId = '', childId = '', registrationNo = '', babyName = '', dob = '', sex = '', guardianName = '', guardianPhone = '', guardianAddress = '',
+    registrationStatus = '', item = '', dose = '', date = '', targetDate = '', status = '', batch = '', worker = '', source = '', documentType = '',
+    documentFilename = '', remarks = '', alertType = ''
+  } = {}) => rows.push([
+    section, recordId, childId, registrationNo, babyName, dob, sex, guardianName, guardianPhone, guardianAddress,
+    registrationStatus, item, dose, date, targetDate, status, batch, worker, source, documentType, documentFilename, remarks, alertType, generatedAt
+  ]);
+
+  normalizedBabies.forEach(baby => {
+    const childId = baby.id || baby.childId || baby.child_id || '';
+    const registrationNo = baby.registrationNumber || baby.registration_number || '';
+    const babyName = baby.name || [baby.firstName, baby.middleName, baby.lastName].filter(Boolean).join(' ').trim() || 'Unnamed baby';
+    const common = {
+      childId,
+      registrationNo,
+      babyName,
+      dob: formatReportDate(baby.dob || baby.date_of_birth),
+      sex: baby.sex || '',
+      guardianName: baby.guardianName || baby.guardian_name || '',
+      guardianPhone: baby.guardianPhone || baby.guardian_phone || '',
+      guardianAddress: baby.guardianAddress || baby.guardian_address || '',
+      registrationStatus: baby.registrationStatus || baby.registration_status || baby.status || ''
+    };
+
+    pushRow({ section: 'Baby Records', recordId: childId, ...common, date: formatReportDate(baby.createdAt || baby.created_at), status: common.registrationStatus });
+
+    (baby.vaccinations || []).forEach(vaccine => {
+      pushRow({
+        section: 'Vaccination Records',
+        recordId: vaccine.id || '',
+        ...common,
+        item: vaccine.vaccine || vaccine.vaccineName || vaccine.vaccine_name || '',
+        dose: vaccine.dose || '',
+        date: vaccine.date || vaccine.administeredAt || vaccine.administered_at || '',
+        status: vaccine.status || 'Completed',
+        batch: vaccine.batch || vaccine.batchNo || vaccine.batch_no || vaccine.lotNumber || vaccine.lot_number || '',
+        worker: vaccine.worker || vaccine.administeredBy || vaccine.administered_by || '',
+        source: vaccine.privateClinic ? (vaccine.clinicName || 'Private Clinic') : (vaccine.clinicName || vaccine.source || 'Barangay Health Center'),
+        remarks: vaccine.remarks || vaccine.reaction || ''
+      });
+    });
+
+    (baby.upcoming || []).forEach(schedule => {
+      const targetDate = schedule.targetDate || schedule.target_date || '';
+      const scheduleStatus = getScheduleStatus({ ...schedule, targetDate });
+      pushRow({
+        section: 'Schedule Records',
+        recordId: schedule.id || '',
+        ...common,
+        item: schedule.vaccine || schedule.title || 'Schedule item',
+        dose: schedule.dose || '',
+        targetDate,
+        status: scheduleStatus,
+        source: schedule.source || schedule.location || '',
+        remarks: schedule.remarks || ''
+      });
+
+      const target = targetDate ? new Date(targetDate) : null;
+      if ((scheduleStatus === 'Overdue') || (target && !Number.isNaN(target.getTime()) && target < todayDate && scheduleStatus !== 'Completed')) {
+        pushRow({
+          section: 'Alerts',
+          recordId: schedule.id || '',
+          ...common,
+          item: schedule.vaccine || schedule.title || 'Vaccination follow-up',
+          dose: schedule.dose || '',
+          targetDate,
+          status: 'Overdue',
+          source: schedule.source || schedule.location || '',
+          remarks: schedule.remarks || '',
+          alertType: 'Medical Alert'
+        });
+      }
+    });
+
+    (baby.documents || []).forEach(doc => {
+      const docStatus = doc.status || '';
+      pushRow({
+        section: 'Document Statuses',
+        recordId: doc.id || '',
+        ...common,
+        date: formatReportDate(doc.uploadDate || doc.upload_date || doc.createdAt || doc.created_at),
+        status: docStatus,
+        documentType: doc.type || 'Birth Certificate',
+        documentFilename: doc.filename || doc.file_name || doc.filePath || doc.file_path || '',
+        remarks: doc.comment || doc.remarks || doc.reason || ''
+      });
+
+      if (['pending', 'rejected', 're-upload requested', 'reupload requested'].includes(String(docStatus).trim().toLowerCase())) {
+        pushRow({
+          section: 'Alerts',
+          recordId: doc.id || '',
+          ...common,
+          date: formatReportDate(doc.uploadDate || doc.upload_date || doc.createdAt || doc.created_at),
+          status: docStatus,
+          documentType: doc.type || 'Birth Certificate',
+          documentFilename: doc.filename || doc.file_name || doc.filePath || doc.file_path || '',
+          remarks: doc.comment || doc.remarks || doc.reason || '',
+          alertType: 'Document Action Item'
+        });
+      }
+    });
+
+    (baby.testHistory || baby.test_history || []).forEach(test => {
+      pushRow({
+        section: 'Medical Test History',
+        recordId: test.id || '',
+        ...common,
+        item: test.test || test.type || 'Medical test',
+        date: formatReportDate(test.date),
+        status: test.status || '',
+        remarks: test.result || test.remarks || ''
+      });
+    });
+  });
+
+  if (!normalizedBabies.length) {
+    pushRow({
+      section: 'No Records',
+      remarks: 'No database records were returned for this report.'
+    });
+  }
+
+  return `\ufeff${rows.map(csvRow).join('\n')}`;
+}
+
+function isMissingExportRouteError(error) {
+  const message = String(error?.message || '').toLowerCase();
+  return message.includes('route not found') || message.includes('not found') || message.includes('404');
+}
+
+async function fetchBackendCsvFromEndpoint(endpoint) {
+  const token = localStorage.getItem('vax_token');
+  const res = await fetch(`${BASE_URL}${endpoint}`, {
+    method: 'GET',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    let message = `Unable to export report from ${endpoint}`;
+    try {
+      const data = JSON.parse(text);
+      message = data.error || message;
+    } catch (_) {
+      if (text) message = text;
+    }
+    const error = new Error(message);
+    error.status = res.status;
+    throw error;
+  }
+
+  return res.blob();
+}
+
+
+export async function downloadAdminReportCsv() {
+  const backendEndpoints = [
+    '/reports/export',
+    '/reports/export.php',
+    '/admin/reports/export',
+    '/dashboard/export',
+    '/backend/reports/export',
+    '/backend/reports/export.php'
+  ];
+
+  let lastError = null;
+
+  for (const endpoint of backendEndpoints) {
+    try {
+      const blob = await fetchBackendCsvFromEndpoint(endpoint);
+      triggerCsvDownload(blob, getReportFilename());
+      return { source: 'backend', endpoint };
+    } catch (error) {
+      lastError = error;
+      const shouldTryNextEndpoint = isMissingExportRouteError(error);
+      if (!shouldTryNextEndpoint) break;
+    }
+  }
+
+  if (lastError && !isMissingExportRouteError(lastError)) {
+    throw lastError;
+  }
+
+  // Prototype-safe fallback: if the deployed backend has not registered the
+  // export route yet, build the CSV from the same database data already used by
+  // the admin dashboard. This keeps the button functional without requiring
+  // manual database access or schema changes.
+  try {
+    const babies = await getAllBabiesFromAPI();
+    const csv = buildClientAdminReportCsv(babies);
+    triggerCsvDownload(csv, getReportFilename('vaxtrack-report-fallback'));
+    return { source: 'frontend-fallback' };
+  } catch (fallbackError) {
+    throw new Error(
+      `Unable to export report. Backend export route is unavailable and fallback data could not be loaded: ${fallbackError.message}`
+    );
+  }
+}
+
 export async function apiFetch(endpoint, options = {}) {
   const token = localStorage.getItem('vax_token');
   const res = await fetch(`${BASE_URL}${endpoint}`, {
@@ -252,7 +550,14 @@ export async function apiFetch(endpoint, options = {}) {
   });
 
   const text = await res.text();
-  const data = text ? JSON.parse(text) : {};
+  let data = {};
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch (error) {
+      data = { error: text };
+    }
+  }
   if (!res.ok) throw new Error(data.error || 'Something went wrong');
   return data;
 }
