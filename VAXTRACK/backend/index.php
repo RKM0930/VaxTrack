@@ -11,31 +11,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
   exit;
 }
 
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
+function normalizeRoutePath($rawPath) {
+  $path = parse_url($rawPath ?: '/', PHP_URL_PATH) ?: '/';
+  $path = rawurldecode($path);
+  $path = preg_replace('#/+#', '/', $path);
 
-// Normalize the request path so API routes work whether the backend is served
-// from the domain root, /backend, or through /index.php/path-style URLs.
-// This prevents valid routes like /reports/export from falling into
-// "Route not found" because of deployment-specific URL prefixes.
-$scriptDir = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
-if ($scriptDir && $scriptDir !== '/' && str_starts_with($path, $scriptDir)) {
-  $path = substr($path, strlen($scriptDir)) ?: '/';
+  $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+  $scriptDir = rtrim(dirname($scriptName), '/');
+
+  // Only strip the actual index.php script directory. Some PHP hosts report
+  // SCRIPT_NAME as the requested API route, so stripping dirname(SCRIPT_NAME)
+  // unconditionally can corrupt valid routes like /auth/login into /login.
+  if (basename($scriptName) === 'index.php' && $scriptDir && $scriptDir !== '/' && str_starts_with($path, $scriptDir . '/')) {
+    $path = substr($path, strlen($scriptDir)) ?: '/';
+  }
+
+  // Support index.php/path-style URLs and common deployment prefixes. Prefixes
+  // are stripped only as complete path segments, not from arbitrary words.
+  do {
+    $previousPath = $path;
+    $path = preg_replace('#^/index\.php(?=/|$)#', '', $path);
+    $path = preg_replace('#^/backend(?=/|$)#', '', $path);
+    $path = preg_replace('#^/api(?=/|$)#', '', $path);
+    $path = $path ?: '/';
+  } while ($path !== $previousPath);
+
+  return '/' . trim($path, '/');
 }
-if (!empty($_SERVER['PATH_INFO']) && ($_SERVER['PATH_INFO'] !== '/')) {
-  $path = $_SERVER['PATH_INFO'];
+
+$routeCandidates = [];
+foreach ([
+  $_SERVER['REQUEST_URI'] ?? '/',
+  $_SERVER['PATH_INFO'] ?? '',
+  $_SERVER['ORIG_PATH_INFO'] ?? '',
+  $_SERVER['REDIRECT_URL'] ?? '',
+] as $candidate) {
+  if ($candidate === '') continue;
+  $normalizedCandidate = normalizeRoutePath($candidate);
+  if (!in_array($normalizedCandidate, $routeCandidates, true)) {
+    $routeCandidates[] = $normalizedCandidate;
+  }
 }
 
-// Repeatedly strip common deployment prefixes so routes still match whether
-// requests arrive as /api/admin/babies/1, /backend/index.php/api/admin/babies/1,
-// or /index.php/admin/babies/1.
-do {
-  $previousPath = $path;
-  $path = preg_replace('#^/backend#', '', $path);
-  $path = preg_replace('#^/index\.php#', '', $path);
-  $path = preg_replace('#^/api#', '', $path);
-} while ($path !== $previousPath);
-
-$path = '/' . trim($path, '/');
+$path = $routeCandidates[0] ?? '/';
 $method = $_SERVER['REQUEST_METHOD'];
 
 // Auth routes

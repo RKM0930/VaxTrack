@@ -1,6 +1,119 @@
 import { filterActiveBabies } from './utils.js';
 
-const BASE_URL = 'https://vaxtrack-database-production.up.railway.app';
+const API_ORIGIN = 'https://vaxtrack-database-production.up.railway.app';
+const BASE_URL = API_ORIGIN.replace(/\/+$/, '');
+const API_ROUTE_PREFIXES = ['/api', '', '/backend'];
+
+function splitEndpoint(endpoint = '') {
+  const rawEndpoint = String(endpoint || '').trim();
+  const safeEndpoint = rawEndpoint || '/';
+  const queryIndex = safeEndpoint.indexOf('?');
+  const rawPath = queryIndex >= 0 ? safeEndpoint.slice(0, queryIndex) : safeEndpoint;
+  const query = queryIndex >= 0 ? safeEndpoint.slice(queryIndex) : '';
+  const path = `/${rawPath.replace(/^\/+/, '')}`.replace(/\/{2,}/g, '/');
+  return { path, query };
+}
+
+function normalizeApiEndpoint(endpoint = '') {
+  let rawEndpoint = String(endpoint || '').trim() || '/';
+
+  if (/^https?:\/\//i.test(rawEndpoint)) {
+    try {
+      const url = new URL(rawEndpoint);
+      rawEndpoint = `${url.pathname}${url.search}`;
+    } catch (error) {
+      console.warn('Unable to normalize API URL:', rawEndpoint, error);
+    }
+  }
+
+  const { path, query } = splitEndpoint(rawEndpoint);
+  const canonicalPath = path
+    .replace(/^\/(?:api|backend)(?=\/|$)/, '')
+    .replace(/^\/index\.php(?=\/|$)/, '') || '/';
+  return `${canonicalPath.startsWith('/') ? canonicalPath : `/${canonicalPath}`}${query}`;
+}
+
+function buildApiUrl(prefix, canonicalEndpoint) {
+  const { path, query } = splitEndpoint(canonicalEndpoint);
+  const cleanPrefix = prefix ? `/${String(prefix).replace(/^\/+|\/+$/g, '')}` : '';
+  const cleanPath = path === '/' ? '' : path;
+  return `${BASE_URL}${cleanPrefix}${cleanPath}${query}`;
+}
+
+function getApiEndpointCandidates(endpoint = '') {
+  const canonicalEndpoint = normalizeApiEndpoint(endpoint);
+  const candidates = API_ROUTE_PREFIXES.map(prefix => buildApiUrl(prefix, canonicalEndpoint));
+  return [...new Set(candidates)];
+}
+
+function getPayloadMessage(payload = {}, fallbackText = '') {
+  if (payload && typeof payload === 'object') {
+    return payload.error || payload.message || payload.detail || fallbackText || '';
+  }
+  return fallbackText || '';
+}
+
+function isRouteNotFoundResponse(status, payload = {}, fallbackText = '') {
+  const message = getPayloadMessage(payload, fallbackText).toLowerCase();
+  return status === 404 || message.includes('route not found') || message.includes('not found');
+}
+
+async function parseJsonResponse(res) {
+  const text = await res.text();
+  if (!text) return { payload: {}, text: '' };
+  try {
+    return { payload: JSON.parse(text), text };
+  } catch (error) {
+    return { payload: { error: text }, text };
+  }
+}
+
+function createApiError(message, status, url, payload = {}) {
+  const error = new Error(message || 'Something went wrong');
+  error.status = status;
+  error.url = url;
+  error.payload = payload;
+  return error;
+}
+
+async function requestApi(endpoint, options = {}, { expectBlob = false, defaultErrorMessage = 'Something went wrong' } = {}) {
+  const candidates = getApiEndpointCandidates(endpoint);
+  let lastRouteError = null;
+
+  for (const url of candidates) {
+    let res;
+    try {
+      res = await fetch(url, options);
+    } catch (error) {
+      // If one deployment prefix is blocked or unavailable, try the next
+      // prefix before failing the whole page. This protects login and dashboard
+      // pages from global route/proxy differences.
+      lastRouteError = createApiError(error.message || defaultErrorMessage, 0, url);
+      continue;
+    }
+
+    if (res.ok) {
+      return expectBlob ? res.blob() : (await parseJsonResponse(res)).payload;
+    }
+
+    const { payload, text } = await parseJsonResponse(res);
+    const message = getPayloadMessage(payload, text) || defaultErrorMessage;
+    const error = createApiError(message, res.status, url, payload);
+
+    // Try the next valid deployment prefix only when the current URL clearly
+    // reached a missing route. Do not retry validation/auth/server errors, so
+    // POST actions are not duplicated.
+    if (isRouteNotFoundResponse(res.status, payload, text)) {
+      lastRouteError = error;
+      continue;
+    }
+
+    throw error;
+  }
+
+  throw lastRouteError || createApiError(defaultErrorMessage, 0, candidates[0] || BASE_URL);
+}
+
 
 const today = new Date().toISOString().split('T')[0];
 
@@ -469,28 +582,15 @@ function isMissingExportRouteError(error) {
 
 async function fetchBackendCsvFromEndpoint(endpoint) {
   const token = localStorage.getItem('vax_token');
-  const res = await fetch(`${BASE_URL}${endpoint}`, {
+  return requestApi(endpoint, {
     method: 'GET',
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
+  }, {
+    expectBlob: true,
+    defaultErrorMessage: `Unable to export report from ${endpoint}`,
   });
-
-  if (!res.ok) {
-    const text = await res.text();
-    let message = `Unable to export report from ${endpoint}`;
-    try {
-      const data = JSON.parse(text);
-      message = data.error || message;
-    } catch (_) {
-      if (text) message = text;
-    }
-    const error = new Error(message);
-    error.status = res.status;
-    throw error;
-  }
-
-  return res.blob();
 }
 
 
@@ -540,24 +640,17 @@ export async function downloadAdminReportCsv() {
 
 export async function apiFetch(endpoint, options = {}) {
   const token = localStorage.getItem('vax_token');
-  const res = await fetch(`${BASE_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {}),
-    },
-  });
+  const headers = {
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(options.headers || {}),
+  };
 
-  const text = await res.text();
-  let data = {};
-  if (text) {
-    try {
-      data = JSON.parse(text);
-    } catch (error) {
-      data = { error: text };
-    }
+  if (options.body && !(options.body instanceof FormData) && !headers['Content-Type']) {
+    headers['Content-Type'] = 'application/json';
   }
-  if (!res.ok) throw new Error(data.error || 'Something went wrong');
-  return data;
+
+  return requestApi(endpoint, {
+    ...options,
+    headers,
+  });
 }
